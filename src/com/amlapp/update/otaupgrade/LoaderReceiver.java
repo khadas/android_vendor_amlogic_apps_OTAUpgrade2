@@ -21,7 +21,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.BufferedReader;
-
+import java.io.FileInputStream;
 import com.amlogic.update.Backup;
 
 public class LoaderReceiver extends BroadcastReceiver {
@@ -100,8 +100,15 @@ public class LoaderReceiver extends BroadcastReceiver {
                         }
                         if (bkfile.exists() && !mPref.getBooleanVal(PrefUtils.PREF_START_RESTORE, false)){
                             mPref.setBoolean(PrefUtils.PREF_START_RESTORE, true);
-                            Backup mBackup = new Backup(mContext);
-                            mBackup.main(args);
+                                try{
+                                FileInputStream fis = new FileInputStream(bkfile) ;
+                                if (fis.available()<=0){
+                                    bkfile.delete();
+                                }else{
+                                    Backup mBackup = new Backup(mContext);
+                                    mBackup.main(args);
+                                }
+                            }catch(Exception ex){}
                         }else if(bkfile.exists()) {
                             mPref.setBoolean(PrefUtils.PREF_START_RESTORE, false);
                             bkfile.delete();
