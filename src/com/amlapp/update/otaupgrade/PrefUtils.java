@@ -149,6 +149,10 @@ public class PrefUtils {
             } catch (IOException excep) {
             }
         }
+        if (!flagFile.canWrite())
+        {
+            return;
+        }
         FileWriter fw = null;
         try {
             fw = new FileWriter(flagFile);
