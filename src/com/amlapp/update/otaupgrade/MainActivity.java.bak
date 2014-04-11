@@ -24,7 +24,7 @@ import java.util.Locale;
 import org.apache.http.util.EncodingUtils;
 
 import com.amlogic.update.OtaUpgradeUtils;
-
+import com.amlogic.update.util.PrefUtil;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -76,7 +76,7 @@ public class MainActivity extends Activity  implements OnClickListener {
     private PrefUtils mPreference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        OtaUpgradeUtils.setDebugMode(true);
+        PrefUtil.DEBUG = true;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_view);
         hideBackUp();
