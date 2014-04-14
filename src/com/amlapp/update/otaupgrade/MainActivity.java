@@ -76,7 +76,6 @@ public class MainActivity extends Activity  implements OnClickListener {
     private PrefUtils mPreference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        OtaUpgradeUtils.setDebugMode(true);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_view);
         hideBackUp();
