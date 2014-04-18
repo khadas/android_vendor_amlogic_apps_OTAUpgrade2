@@ -335,6 +335,9 @@ public class UpdateActivity extends Activity {
                 }
             }
         });
+        if (mDownSize == 0) {
+            mDownSize = (int) mPreference.getFileSize();
+        }
         mCancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -369,14 +372,8 @@ public class UpdateActivity extends Activity {
                     .getAction();
             boolean b = mServiceBinder
                     .getTaskRunnningStatus(UpdateService.TASK_ID_DOWNLOAD) == UpdateTasks.RUNNING_STATUS_UNSTART;
-            /*mDownSize = mServiceBinder
-                    .getTaskProgress(UpdateService.TASK_ID_DOWNLOAD);*/
-            Log.d(TAG,"has already download: " + mDownSize+ "DownloadTask Status"+mServiceBinder.getTaskRunnningStatus(UpdateService.TASK_ID_DOWNLOAD));
-            if (mDownSize == 0) {
-                mDownSize = (int) mPreference.getFileSize();
-            }
-            Log.d(TAG,"has already download: " + mDownSize+ "boolean onServiceconnected:"+b);
-            
+            mDownSize = mServiceBinder
+                    .getTaskProgress(UpdateService.TASK_ID_DOWNLOAD);
             if (mDownSize == 0 && b) {
                 mServiceBinder
                         .startTask(UpdateService.TASK_ID_CHECKING);
