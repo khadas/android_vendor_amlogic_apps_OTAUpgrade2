@@ -95,4 +95,6 @@
     <string name="copy_failed_restart">"复制升级文件到:%s失败,重新复制"</string>
     <string name="prepare_copy">"准备复制升级文件"</string>
     <string name="start_copy">"开始复制升级文件"</string>
+	<string name="scan_title">扫描</string>
+	<string name="scan_tip">扫描中,请等待...</string>
 </resources>

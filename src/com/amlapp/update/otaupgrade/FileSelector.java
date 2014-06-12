@@ -30,7 +30,9 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-
+import android.app.ProgressDialog;
+import android.os.Handler;
+import android.os.Message;
 
 /**
  * @ClassName FileSelector
@@ -41,6 +43,7 @@ import java.util.ArrayList;
  * @Version V1.0
  */
 public class FileSelector extends Activity implements OnItemClickListener {
+    private static final String TAG = "FileSelector";
     public static final String  FILE       = "file";
     private File                mCurrentDirectory;
     private LayoutInflater      mInflater;
@@ -55,6 +58,54 @@ public class FileSelector extends Activity implements OnItemClickListener {
     private static final String UDISK_JB2  = "/storage/external_storage/sd";
     private static final String SDCARD_JB  = "/sdcard/external_sdcard";
     private static final String SDCARD_JB1 = "/storage/external_storage/sdcard";
+    private ProgressDialog mPdWatingScan = null;
+    private static final int MSG_HIDE_SHOW_DIALOG = 1;
+    private static final int MSG_SHOW_WAIT_DIALOG = 2;
+    private static final int MSG_NOTIFY_DATACHANGE = 3;
+    private static final int WAITDIALOG_DISPALY_TIME = 500;
+
+    private Handler mHandler =new Handler(){
+        @Override
+        public void handleMessage(Message msg){
+	    super.handleMessage(msg);
+	    switch(msg.what) {
+	    case MSG_SHOW_WAIT_DIALOG:
+                mPdWatingScan = ProgressDialog.show(FileSelector.this, getResources().getString(R.string.scan_title), getResources().getString(R.string.scan_tip) );
+            break;
+            case MSG_HIDE_SHOW_DIALOG:
+		removeMessages(MSG_SHOW_WAIT_DIALOG);
+		if( mPdWatingScan != null ) {
+            		mPdWatingScan.dismiss();
+			mPdWatingScan = null;
+		}
+	    break;
+	    case MSG_NOTIFY_DATACHANGE:
+	    	mAdapter.notifyDataSetChanged();
+	    break;
+	    default:
+		break;
+	    }
+        }
+    };
+
+    private void startScanThread() {
+      Message nmsg = mHandler.obtainMessage(MSG_SHOW_WAIT_DIALOG);
+      mHandler.sendMessageDelayed(nmsg, WAITDIALOG_DISPALY_TIME);
+
+      new Thread(){
+         public void run(){
+	    File[] files = new File[2];
+        files[0] = new File("/sdcard");
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+            files[1] = new File("/mnt/");
+        } else {
+            files[1] = new File("/storage");
+        }
+            mAdapter.getList(files);
+            mHandler.sendEmptyMessage(MSG_HIDE_SHOW_DIALOG);
+         }
+      }.start();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,14 +114,7 @@ public class FileSelector extends Activity implements OnItemClickListener {
         setContentView(R.layout.file_list);
         mListView = (ListView) findViewById(R.id.file_list);
         mListView.setAdapter(mAdapter);
-        File[] files = new File[2];
-        files[0] = new File("/sdcard");
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-            files[1] = new File("/mnt/");
-        } else {
-            files[1] = new File("/storage");
-        }
-        mAdapter.getList(files);
+        startScanThread();
         mListView.setOnItemClickListener(this);
     }
     
@@ -133,7 +177,7 @@ public class FileSelector extends Activity implements OnItemClickListener {
             for (int i = 0; i < files.size(); i++) {
                 mFiles[i] = (File) files.get(i);
             }
-            notifyDataSetChanged();
+            mHandler.sendEmptyMessage(MSG_NOTIFY_DATACHANGE);
         }
         
         @Override

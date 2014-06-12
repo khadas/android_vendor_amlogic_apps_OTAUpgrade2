@@ -94,4 +94,6 @@
      <string name="prepare_copy">Prepare to Copy Files</string>
     <string name="start_copy">Copying...</string>
     <string name="copy_failed_restart">Copy Files to Exteranl Storage:%s Failed,Restart Copying</string>
+	<string name="scan_title">Scanning</string>
+	<string name="scan_tip">Scanning,Please wait...</string>
 </resources>
