@@ -511,24 +511,25 @@ public class UpdateActivity extends Activity {
                                                public void onReceive(
                                                        Context context,
                                                        Intent intent) {
-                                                   if (intent
-                                                           .getAction()
-                                                           .equals("android.net.conn.CONNECTIVITY_CHANGE")) {
+                                                   if (intent.getAction().equals("android.net.conn.CONNECTIVITY_CHANGE")) {
                                                        ConnectivityManager manager = (ConnectivityManager) context
                                                                .getSystemService(Context.CONNECTIVITY_SERVICE);
-                                                       NetworkInfo mobileInfo = manager
+                                                       /*NetworkInfo mobileInfo = manager
                                                                .getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                                                        NetworkInfo wifiInfo = manager
-                                                               .getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                                                               .getNetworkInfo(ConnectivityManager.TYPE_WIFI);*/
                                                        NetworkInfo activeInfo = manager
                                                                .getActiveNetworkInfo();
-                                                       if (!wifiInfo
+                                                       if (activeInfo!=null && !activeInfo
                                                                .isConnected()) {
-                                                               Toast.makeText(
+                                                             if (activeInfo.getState() != NetworkInfo.State.CONNECTED) { 
+                                                                Toast.makeText(
                                                                        context,
                                                                        R.string.net_status_change,
                                                                        1).show();
+                                                              }
                                                        }
+                                                       /*
                                                        if (!wifiInfo
                                                                .isConnectedOrConnecting()
                                                                && Integer
@@ -551,7 +552,7 @@ public class UpdateActivity extends Activity {
                                                            mCombineBtn
                                                                    .setTag(Integer
                                                                            .valueOf(R.string.download_resume));
-                                                       }
+                                                       }*/
                                                    }
                                                }
                                            };
