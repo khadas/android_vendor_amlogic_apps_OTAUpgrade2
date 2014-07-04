@@ -209,8 +209,7 @@ public class UpdateActivity extends Activity {
         boolean isScriptAsk = mPreference.getScriptAsk();
         if (isScriptAsk) {
             String Mounted = Environment.getExternalStorage2State();
-            if (!Environment.isExternalStorageBeSdcard()
-                    || Mounted.equals(Environment.MEDIA_MOUNTED)) {
+            if (Mounted.equals(Environment.MEDIA_MOUNTED)) {
                 StatFs statFs = new StatFs(Environment
                         .getExternalStorage2Directory().getPath());
                 int blockSize = statFs.getBlockSize();

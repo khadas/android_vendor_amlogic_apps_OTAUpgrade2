@@ -1,11 +1,11 @@
 <?xml version="1.0"   encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:gravity="center_vertical|center_horizontal"
     android:orientation="vertical" >
 
-    <RelativeLayout
+    <!--<RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="30dip"
@@ -24,31 +24,29 @@
             android:layout_centerInParent="true"
             android:layout_marginLeft="10dip"
             android:layout_toRightOf="@id/dialog_title_image"
-            android:text="@string/warnning_title"
-            android:textColor="#000000"
-            android:textSize="30sp" />
-    </RelativeLayout>
+            android:text="@string/warnning_title"/>
+    </RelativeLayout>-->
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="20dp"
         android:layout_marginLeft="6dp"
-        android:layout_marginRight="6dp"
-        android:background="#0099CC" />
+        android:layout_marginRight="6dp"/>
 
     <TextView
         android:id="@+id/info"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dip"
+		android:layout_marginRight="30dip"
+		android:textSize="22sp"
         android:layout_marginTop="10dip"
-        android:textSize="24sp"
-        android:text="@string/warnning"
-        android:textColor="#000000" />
+        android:text="@string/warnning"/>
 
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+		android:paddingTop="40dp"
         android:gravity="bottom|center_horizontal">
 
         <Button
@@ -58,6 +56,7 @@
             android:layout_alignParentLeft="true"
             android:paddingBottom="10dip"
             android:paddingLeft="30dp"
+			android:textSize="24sp"
             android:paddingRight="30dp"
             android:paddingTop="10dip"
             android:layout_marginLeft="30dp"
@@ -70,6 +69,7 @@
             android:paddingBottom="10dip"
             android:paddingLeft="30dp"
             android:paddingRight="30dp"
+			android:textSize="24sp"
             android:paddingTop="10dip"
             android:layout_alignBaseline="@id/sdcard_cancel"
             android:layout_alignParentRight="true"
