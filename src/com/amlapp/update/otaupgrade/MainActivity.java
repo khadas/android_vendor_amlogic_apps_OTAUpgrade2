@@ -291,6 +291,17 @@ public class MainActivity extends Activity  implements OnClickListener {
             return false;
         }
         file = new File("/cache/recovery/command");
+        try{
+            File parent = file.getParentFile();
+            if(!parent.exists()){
+                parent.mkdirs();
+            }
+            if(!file.exists()){
+                file.createNewFile();
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+        }
         res += "--update_package=";
         if (Environment.MEDIA_MOUNTED.equals(Environment
             .getExternalStorage2State()) && FileSelector.isSdcard(fullpath)) {
