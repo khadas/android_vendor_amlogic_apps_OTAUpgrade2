@@ -215,9 +215,8 @@ public class UpdateActivity extends Activity {
                 int blockSize = statFs.getBlockSize();
                 int avaliableBlocks = statFs.getAvailableBlocks();
                 int totalBlocks = statFs.getBlockCount();
-                if (mDownSize == 0) {
-                    mDownSize = (int) mPreference.getFileSize();
-                }
+                mDownSize = (int) mPreference.getFileSize();
+ 
                 if (mDownSize > 0 && (mDownSize / blockSize) > avaliableBlocks) {
                     Toast.makeText(UpdateActivity.this,
                             R.string.capacty_not_enough, Toast.LENGTH_LONG)
@@ -334,9 +333,9 @@ public class UpdateActivity extends Activity {
                 }
             }
         });
-        if (mDownSize == 0) {
-            mDownSize = (int) mPreference.getFileSize();
-        }
+ 
+        mDownSize = (int) mPreference.getFileSize();
+ 
         mCancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -371,9 +370,9 @@ public class UpdateActivity extends Activity {
                     .getAction();
             boolean b = mServiceBinder
                     .getTaskRunnningStatus(UpdateService.TASK_ID_DOWNLOAD) == UpdateTasks.RUNNING_STATUS_UNSTART;
-            mDownSize = mServiceBinder
+            int lastDownSize = mServiceBinder
                     .getTaskProgress(UpdateService.TASK_ID_DOWNLOAD);
-            if (mDownSize == 0 && b) {
+            if (lastDownSize == 0 && b) {
                 mServiceBinder
                         .startTask(UpdateService.TASK_ID_CHECKING);
                 setCheckView();
