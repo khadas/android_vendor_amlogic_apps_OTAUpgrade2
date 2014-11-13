@@ -12,7 +12,7 @@
     <string name="backup_ok">YES,Backup</string>
     <string name="backup_cancel">NO,Discard</string>
     <string name="backup_file">backup</string>
-    <string name="sdcard_title">INSERT SDCARD</string>
+    <string name="sdcard_title">Insert External Storage</string>
     <string name="sdcard_info">Move External Storage unDesirable,OTAUpgrade Closing</string>
     <string name="sdcard_ok">YES,Already Insert</string>
     <string name="sdcard_cancel">NO,NO Backup</string>

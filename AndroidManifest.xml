@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.amlapp.update.otaupgrade"
     android:versionCode="2"
-    android:versionName="2.02013091313331" >
+    android:versionName="2.0201411131439" >
 
     <uses-permission android:name="android.permission.BACKUP" />
     <uses-permission android:name="android.permission.ACCESS_CACHE_FILESYSTEM" />

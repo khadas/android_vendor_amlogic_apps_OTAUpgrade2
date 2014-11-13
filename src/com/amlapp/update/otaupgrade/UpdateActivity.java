@@ -208,10 +208,10 @@ public class UpdateActivity extends Activity {
     private boolean handleSDcardSituation() {
         boolean isScriptAsk = mPreference.getScriptAsk();
         if (isScriptAsk) {
-            String Mounted = Environment.getExternalStorage2State();
-            if (Mounted.equals(Environment.MEDIA_MOUNTED)) {
-                StatFs statFs = new StatFs(Environment
-                        .getExternalStorage2Directory().getPath());
+            String filePath = mPreference.getUpdatePath();
+            File saveFilePath = new File(filePath).getParentFile();
+            if (saveFilePath.canWrite()) {
+                StatFs statFs = new StatFs(saveFilePath.getAbsolutePath());
                 int blockSize = statFs.getBlockSize();
                 int avaliableBlocks = statFs.getAvailableBlocks();
                 int totalBlocks = statFs.getBlockCount();
