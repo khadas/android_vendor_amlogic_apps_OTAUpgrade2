@@ -39,7 +39,7 @@ public class PrefUtils {
     private static final String PREFS_UPDATE_SCRIPT     = "update_with_script";
     private static final String PREFS_UPDATE_FILESIZE = "update_file_size";
     private static final String PREFS_UPDATE_DESC ="update_desc";
-
+    public static final String DEV_PATH ="/storage/external_storage";
     public static final String PREF_START_RESTORE      = "retore_start";
     public static final String PREF_AUTO_CHECK = "auto_check";
     static final String  FlagFile                = ".wipe_record";
@@ -137,12 +137,18 @@ public class PrefUtils {
         return ("true").equals(SystemProperties.get("ro.product.update.autocheck"));
     }
     void write2File() {
-        String Mounted = Environment.getExternalStorage2State();
-        if (!Mounted.equals(Environment.MEDIA_MOUNTED)) {
-            return;
+        String flagParentPath=Environment
+             .getExternalStorage2Directory().getAbsolutePath()+"/";
+        File devDir = new File(DEV_PATH);
+            File[] devs = devDir.listFiles();
+            for(File dev:devs){
+                if(dev.isDirectory()&&dev.canWrite()){
+                flagParentPath = dev.getAbsolutePath();
+                flagParentPath += "/";
+                break;
+            }
         }
-        File flagFile = new File(Environment.getExternalStorage2Directory(),
-                FlagFile);
+        File flagFile = new File(flagParentPath,FlagFile);
         if (!flagFile.exists()) {
             try {
                 flagFile.createNewFile();

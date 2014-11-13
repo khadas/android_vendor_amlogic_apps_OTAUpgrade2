@@ -31,12 +31,26 @@ public class LoaderReceiver extends BroadcastReceiver {
     public static final String CHECKING_TASK_COMPLETED = "com.android.update.CHECKING_TASK_COMPLETED";
     public static final String RESTOREDATA = "com.android.amlogic.restoredata";
     public static final String BACKUPDATA = "com.android.amlogic.backupdata";
-    public static final String BACKUP_FILE = Environment
+    public static String BACKUP_FILE = Environment
             .getExternalStorage2Directory().getAbsolutePath() + "/" + "BACKUP";
     private PrefUtils mPref;
     private Context mContext;
+    
+    private static void getBackUpFileName(){
+                File devDir = new File(PrefUtils.DEV_PATH);
+                File[] devs = devDir.listFiles();
+                for(File dev:devs){
+                    if(dev.isDirectory()&&dev.canWrite()){
+                            BACKUP_FILE = dev.getAbsolutePath();
+                            BACKUP_FILE += "/BACKUP";
+                            break;
+                    }
+                }
+        }
+
     @Override
     public void onReceive(Context context, Intent intent) {
+        getBackUpFileName();
         mContext = context;
         mPref = new PrefUtils(mContext);
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)
@@ -81,9 +95,9 @@ public class LoaderReceiver extends BroadcastReceiver {
                     Thread.sleep(5000);
                 }catch (InterruptedException e){
                 }finally{
-                    boolean ismounted = Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorage2State());
-                    File flagFile = new File(Environment.getExternalStorage2Directory(),PrefUtils.FlagFile);
-                    if (ismounted) {
+                    //boolean ismounted = Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorage2State());
+                    File flagFile = new File(new File(BACKUP_FILE).getParentFile(),PrefUtils.FlagFile);
+                    //if (ismounted) {
                         File bkfile = new File(BACKUP_FILE);
                         if (flagFile.exists()) {
                             try{
@@ -113,7 +127,7 @@ public class LoaderReceiver extends BroadcastReceiver {
                             mPref.setBoolean(PrefUtils.PREF_START_RESTORE, false);
                             bkfile.delete();
                         }
-                    }
+                   // }
                 }
             }
         }.start();

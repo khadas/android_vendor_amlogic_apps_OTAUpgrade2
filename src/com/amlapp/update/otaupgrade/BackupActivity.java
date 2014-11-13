@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import java.io.File;
 import com.amlogic.update.Backup;
 
 /** 
@@ -30,13 +31,27 @@ import com.amlogic.update.Backup;
  * @Version V1.0
  */
 public class BackupActivity extends Activity{
-    public static final String BACKUP_FILE = Environment
+    public static String BACKUP_FILE = Environment
             .getExternalStorage2Directory().getAbsolutePath() + "/" + "BACKUP";
+        public static final String SdcardDir = Environment
+            .getExternalStorage2Directory().getAbsolutePath();
         public static final int FUNCBACKUP = 1;
         public static final int FUNCRESTORE = 2;
         public static int func = 0;
+        private static void getBackUpFileName(){
+                File devDir = new File(PrefUtils.DEV_PATH);
+                File[] devs = devDir.listFiles();
+                for(File dev:devs){
+                    if(dev.isDirectory()&&dev.canWrite()){
+                            BACKUP_FILE = dev.getAbsolutePath();
+                            BACKUP_FILE += "/BACKUP";
+                            break;
+                    }
+                }
+        }
         @Override
         protected void onCreate(Bundle icicle) {
+            getBackUpFileName();
             super.onCreate(icicle);
             boolean flag = false;
             String act = getIntent().getAction();
@@ -92,7 +107,9 @@ public class BackupActivity extends Activity{
         }
 
         private boolean OnSDcardStatus() {
-            return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorage2State());
+            File file = new File(BACKUP_FILE);
+            return  file.getParentFile().canWrite();
+            //return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorage2State());
         }
 
         private void Backup() {
