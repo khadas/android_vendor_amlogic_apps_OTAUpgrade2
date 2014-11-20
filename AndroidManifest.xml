@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.amlapp.update.otaupgrade"
+    package="com.droidlogic.otaupgrade"
     android:versionCode="2"
     android:versionName="2.0201411131439" >
 
@@ -28,17 +28,17 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.amlapp.update.otaupgrade.UpdateActivity"
+            android:name="com.droidlogic.otaupgrade.UpdateActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:name="com.amlapp.update.otaupgrade.FileSelector"
+            android:name="com.droidlogic.otaupgrade.FileSelector"
             android:screenOrientation="landscape" >
         </activity>
 
-        <receiver android:name="com.amlapp.update.otaupgrade.LoaderReceiver" >
+        <receiver android:name="com.droidlogic.otaupgrade.LoaderReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.android.otaupdate.aml.backup" />
@@ -47,16 +47,16 @@
         </receiver>
 
         <activity
-            android:name="com.amlapp.update.otaupgrade.BackupActivity"
+            android:name="com.droidlogic.otaupgrade.BackupActivity"
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:name="com.amlapp.update.otaupgrade.BadMovedSDcard"
+            android:name="com.droidlogic.otaupgrade.BadMovedSDcard"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Holo.Dialog" >
         </activity>
         <activity
-            android:name="com.amlapp.update.otaupgrade.MainActivity"
+            android:name="com.droidlogic.otaupgrade.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:screenOrientation="landscape" >
@@ -67,7 +67,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.amlapp.update.otaupgrade.UpdateService" >
+        <service android:name="com.droidlogic.otaupgrade.UpdateService" >
             <intent-filter>
                 <action android:name="com.android.update.action.check" />
                 <action android:name="com.android.update.action.download" />
