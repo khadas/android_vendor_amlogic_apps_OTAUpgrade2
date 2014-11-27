@@ -36,13 +36,13 @@ import java.io.File;
  * @Version V1.0
  */
 public class BackupActivity extends Activity {
-    public static String BACKUP_FILE = "/storage/external_storage/sdcard1/BACKUP";
+    public static String BACKUP_FILE = "/data/data/com.droidlogic.otaupgrade/BACKUP";
     public static final String SdcardDir = "/storage/external_storage/sdcard1/";
     public static final int FUNCBACKUP = 1;
     public static final int FUNCRESTORE = 2;
     public static int func = 0;
 
-    private static void getBackUpFileName() {
+    /*private static void getBackUpFileName() {
         File devDir = new File(PrefUtils.DEV_PATH);
         File[] devs = devDir.listFiles();
 
@@ -54,11 +54,11 @@ public class BackupActivity extends Activity {
                 break;
             }
         }
-    }
+    }*/
 
     @Override
     protected void onCreate(Bundle icicle) {
-        getBackUpFileName();
+        //getBackUpFileName();
         super.onCreate(icicle);
 
         boolean flag = false;

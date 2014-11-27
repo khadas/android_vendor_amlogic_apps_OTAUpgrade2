@@ -33,6 +33,7 @@
     <string name="install_ota_output_confirm">This Action Can Not Be Interrupted When You Are Updating, please backup you data.</string>
     <string name="install_ota_output_start">"Start Update...Please Ensure that Equipment Power"</string>
     <string name="install_ota_output_checking">Checking The Package...</string>
+    <string name="install_prepare">Preparing...waitting</string>
     <string name="install_ota_output_check_ok">Package Verify Successfully...</string>
     <string name="install_ota_output_check_error">Verifying Failed Lease Check Your Package.</string>
     <string name="install_ota_output_copying">Copying...</string>

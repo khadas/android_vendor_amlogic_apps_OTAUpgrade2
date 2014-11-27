@@ -33,6 +33,7 @@
     <string name="install_ota_output_confirm">"升级过程请勿中断"</string>
     <string name="install_ota_output_start">"开始更新您的系统，请确保升级过程中电量充足"</string>
     <string name="install_ota_output_checking">"正在验证您的升级包"</string>
+    <string name="install_prepare">"正在准备升级环境，请耐心等待..."</string>
     <string name="install_ota_output_check_ok">"升级包验证成功..."</string>
     <string name="install_ota_output_check_error">"升级包验证失败，请检查您的升级包是否正确"</string>
     <string name="install_ota_output_copying">"正在复制文件..."</string>

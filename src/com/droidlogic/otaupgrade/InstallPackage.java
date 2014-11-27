@@ -34,6 +34,7 @@ import java.io.File;
 
 public class InstallPackage extends LinearLayout implements OtaUpgradeUtils.ProgressListener {
     private ProgressBar mProgressBar;
+    private ProgressBar mPrepareBar;
     private LinearLayout mOutputField;
     private LayoutInflater mInflater;
     private String mPackagePath;
@@ -61,6 +62,7 @@ public class InstallPackage extends LinearLayout implements OtaUpgradeUtils.Prog
         super.onFinishInflate();
         mProgressBar = (ProgressBar) findViewById(R.id.verify_progress);
         mOutputField = (LinearLayout) findViewById(R.id.output_field);
+        mPrepareBar = (ProgressBar) findViewById(R.id.prepare_progress);
 
         final TextView tv = (TextView) mInflater.inflate(R.layout.medium_text,
                 null);
@@ -82,15 +84,21 @@ public class InstallPackage extends LinearLayout implements OtaUpgradeUtils.Prog
                     if (mPref != null) {
                         mPref.write2File();
                     }
-
+                    mDismiss.setEnabled(false);
+                    TextView tv = (TextView) mInflater.inflate(R.layout.medium_text,
+                                null);
+                    tv.setText(R.string.install_prepare);
+                    mOutputField.addView(tv);
+                    mPrepareBar.setVisibility(View.VISIBLE);
                     new Thread(new Runnable() {
                             @Override
                             public void run() {
+                                PrefUtils.copyBKFile();
+                                mPrepareBar.setVisibility(View.GONE);
                                 mUpdateUtils.upgrade(new File(mPackagePath),
                                     InstallPackage.this, mUpdateMode);
                             }
                         }).start();
-                    mDismiss.setEnabled(false);
                 }
             });
     }

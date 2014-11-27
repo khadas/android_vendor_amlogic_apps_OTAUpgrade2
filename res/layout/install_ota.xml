@@ -22,6 +22,16 @@
         android:layout_height="match_parent" >
 
         <ProgressBar
+            android:id="@+id/prepare_progress"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="400dp"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp" />
+
+        <ProgressBar
             android:id="@+id/verify_progress"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="400dp"
