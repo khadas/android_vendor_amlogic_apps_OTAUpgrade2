@@ -92,7 +92,6 @@ public class MainActivity extends Activity implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_view);
-        hideBackUp();
         mOnlineUpdateBtn = (Button) findViewById(R.id.updatebtn);
         mLocalUpdateBtn = (Button) findViewById(R.id.btn_update_locale);
         mUpdateCertern = (Button) findViewById(R.id.btn_locale_certern);
@@ -367,15 +366,8 @@ public class MainActivity extends Activity implements OnClickListener {
             res += "/sdcard/";
         } else if (FileSelector.isUdisk(fullpath)) {
             res += "/udisk/";
-        } else if (FileSelector.isMediaPart(fullpath)) {
-            res += "/media/";
-            UpdateMode = OtaUpgradeUtils.UPDATE_RECOVERY;
         } else {
             UpdateMode = OtaUpgradeUtils.UPDATE_UPDATE;
-        }
-
-        if (FileSelector.isICSupdate() && !FileSelector.isMediaPart(fullpath)) {
-            UpdateMode = OtaUpgradeUtils.UPDATE_RECOVERY;
         }
 
         res += filename.getText().toString();
@@ -411,16 +403,5 @@ public class MainActivity extends Activity implements OnClickListener {
         }
 
         return result;
-    }
-
-    public void hideBackUp() {
-        if (FileSelector.isICSupdate()) {
-            TextView tv = (TextView) findViewById(R.id.backuptitle);
-            ViewGroup backupViews = (ViewGroup) findViewById(R.id.backup_layout);
-            View div = (View) findViewById(R.id.divider1);
-            div.setVisibility(View.GONE);
-            tv.setVisibility(View.GONE);
-            backupViews.setVisibility(View.GONE);
-        }
     }
 }

@@ -413,11 +413,7 @@ public class UpdateActivity extends Activity {
                         int UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
 
                         if (mPreference.getScriptAsk()) {
-                            if (FileSelector.isICSupdate()) {
-                                UpdateMode = OtaUpgradeUtils.UPDATE_REBOOT;
-                            } else {
                                 UpdateMode = OtaUpgradeUtils.UPDATE_UPDATE;
-                            }
                         }
 
                         final Dialog dlg = new Dialog(UpdateActivity.this);
