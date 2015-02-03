@@ -5,6 +5,7 @@
     android:versionName="2.0201411271418" >
 
     <uses-permission android:name="android.permission.BACKUP" />
+    <uses-permission android:name="android.permission.RECOVERY" />
     <uses-permission android:name="android.permission.ACCESS_CACHE_FILESYSTEM" />
     <uses-permission android:name="android.permission.REBOOT" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
