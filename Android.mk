@@ -8,7 +8,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := OTAUpgrade
 LOCAL_CERTIFICATE := platform
-LOCAL_DEX_PREOPT := false
+#LOCAL_DEX_PREOPT := false
 LOCAL_PROGUARD_ENABLED := full
 LOCAL_PROGUARD_FLAGS := -include $(LOCAL_PATH)/proguard.flags
 
