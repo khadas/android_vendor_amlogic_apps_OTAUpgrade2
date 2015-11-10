@@ -54,13 +54,11 @@ import java.util.ArrayList;
 public class FileSelector extends Activity implements OnItemClickListener {
         private static final String TAG = "FileSelector";
         public static final String FILE = "file";
-        private static final String LOCAL = "/sdcard";
-        private static final String UDISK = "/storage/udisk";
-        private static final String SDCARD = "/storage/sdcard";
         private static final int MSG_HIDE_SHOW_DIALOG = 1;
         private static final int MSG_SHOW_WAIT_DIALOG = 2;
         private static final int MSG_NOTIFY_DATACHANGE = 3;
         private static final int WAITDIALOG_DISPALY_TIME = 500;
+        private PrefUtils mPrefUtil;
         private File mCurrentDirectory;
         private LayoutInflater mInflater;
         private FileAdapter mAdapter = new FileAdapter();
@@ -97,9 +95,7 @@ public class FileSelector extends Activity implements OnItemClickListener {
             mHandler.sendMessageDelayed ( nmsg, WAITDIALOG_DISPALY_TIME );
             new Thread() {
                 public void run() {
-                    File[] files = new File[2];
-                    files[0] = new File ( "/sdcard" );
-                    files[1] = new File ( "/storage" );
+                    ArrayList<File> files = mPrefUtil.getExternalStorageList();
                     mAdapter.getList ( files );
                     mHandler.sendEmptyMessage ( MSG_HIDE_SHOW_DIALOG );
                 }
@@ -115,6 +111,7 @@ public class FileSelector extends Activity implements OnItemClickListener {
             mListView.setAdapter ( mAdapter );
             startScanThread();
             mListView.setOnItemClickListener ( this );
+            mPrefUtil = new PrefUtils(this);
         }
 
         @Override
@@ -129,19 +126,6 @@ public class FileSelector extends Activity implements OnItemClickListener {
             }
         }
 
-        public static boolean isUdisk ( String dir ) {
-            if ( dir.startsWith ( UDISK ) && !dir.contains ( "sdcard" ) ) {
-                return true;
-            }
-            return false;
-        }
-
-        public static boolean isSdcard ( String dir ) {
-            if ( dir.startsWith ( SDCARD ) ) {
-                return true;
-            }
-            return false;
-        }
 
         private class FileAdapter extends BaseAdapter {
                 private File[] mFiles;
@@ -157,6 +141,21 @@ public class FileSelector extends Activity implements OnItemClickListener {
                             files.add ( tempFiles[i] );
                         }
                     }
+                }
+
+                public void getList ( ArrayList<File> dir ) {
+                    if ( dir == null) {
+                        return;
+                    }
+                    for (int i = 0; i < dir.size(); i++ ) {
+                        File directory = dir.get(i);
+                        setCurrentList ( directory );
+                    }
+                    mFiles = new File[files.size()];
+                    for ( int i = 0; i < files.size(); i++ ) {
+                        mFiles[i] = ( File ) files.get ( i );
+                    }
+                    mHandler.sendEmptyMessage ( MSG_NOTIFY_DATACHANGE );
                 }
 
                 public void getList ( File[] dir ) {
@@ -204,11 +203,7 @@ public class FileSelector extends Activity implements OnItemClickListener {
                     String dir = directory.getPath();
                     if ( new File ( directory, file ).isDirectory() ) {
                         return true;
-                    } else if ( file.toLowerCase().endsWith ( ".zip" ) && isSdcard ( dir ) &&
-                                !isUdisk ( dir ) ) {
-                        return true;
-                    } else if ( file.toLowerCase().endsWith ( ".zip" ) && isUdisk ( dir ) &&
-                                !isSdcard ( dir ) ) {
+                    } else if ( file.toLowerCase().endsWith ( ".zip" )) {
                         return true;
                     } else {
                         return false;

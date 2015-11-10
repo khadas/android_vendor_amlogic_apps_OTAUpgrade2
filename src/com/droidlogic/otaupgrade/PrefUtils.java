@@ -23,9 +23,14 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import android.os.storage.VolumeInfo;
+import android.os.storage.DiskInfo;
+import android.os.storage.StorageManager;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.BufferedInputStream;
@@ -153,16 +158,52 @@ public class PrefUtils {
                                            "ro.product.update.autocheck" ) );
         }
 
+        public ArrayList<File> getExternalStorageList(){
+            ArrayList<File> devList = new ArrayList<File>();
+            StorageManager mStorageManager = (StorageManager)mContext.getSystemService(Context.STORAGE_SERVICE);
+
+            List<VolumeInfo> mVolumes = mStorageManager.getVolumes();
+            Collections.sort(mVolumes, VolumeInfo.getDescriptionComparator());
+            for (VolumeInfo vol : mVolumes) {
+                if (vol != null && vol.isMountedReadable() && vol.getType() == VolumeInfo.TYPE_PUBLIC) {
+                    devList.add(vol.getPath());
+                    Log.d(TAG, "path.getName():" + vol.getPath().getAbsolutePath());
+                }
+            }
+            return devList;
+        }
+
+        public DiskInfo getDiskInfo(String filePath){
+            StorageManager mStorageManager = (StorageManager)mContext.getSystemService(Context.STORAGE_SERVICE);
+
+            List<VolumeInfo> mVolumes = mStorageManager.getVolumes();
+            Collections.sort(mVolumes, VolumeInfo.getDescriptionComparator());
+            for ( VolumeInfo vol : mVolumes ) {
+                if ( vol != null && vol.isMountedReadable() ) {
+                    DiskInfo info = vol.getDisk();
+                    if ( info != null && filePath.contains(vol.getPath().getAbsolutePath()) ) {
+                        return info;
+                    }
+                    Log.d(TAG, "path.getName():" + vol.getPath().getAbsolutePath());
+                }
+            }
+            return null;
+        }
+
+
         void write2File() {
-            String flagParentPath = "/storage/external_storage/sdcard1/";
-            File devDir = new File ( DEV_PATH );
-            File[] devs = devDir.listFiles();
-        for ( File dev : devs ) {
-                if ( dev.isDirectory() && dev.canWrite() ) {
-                    flagParentPath = dev.getAbsolutePath();
+            ArrayList<File> externalDevs =  getExternalStorageList();
+            String flagParentPath = null;
+            for ( int j = 0; (externalDevs != null) && j < externalDevs.size(); j++ ) {
+                File dir = externalDevs.get(j);
+                if ( dir.isDirectory() && dir.canWrite() ) {
+                    flagParentPath = dir.getAbsolutePath();
                     flagParentPath += "/";
                     break;
                 }
+            }
+            if ( flagParentPath == null ) {
+                return;
             }
             File flagFile = new File ( flagParentPath, FlagFile );
             if ( !flagFile.exists() ) {
@@ -174,6 +215,7 @@ public class PrefUtils {
             if ( !flagFile.canWrite() ) {
                 return;
             }
+
             FileWriter fw = null;
             try {
                 fw = new FileWriter ( flagFile );
@@ -226,7 +268,7 @@ public class PrefUtils {
             FileOutputStream fo = null;
             FileChannel in = null;
             FileChannel out = null;
-
+            Log.d(TAG,"copyFile from "+fileFromPath+" to "+fileToPath);
             try {
                 fi = new FileInputStream ( new File ( fileFromPath ) );
                 in = fi.getChannel();
@@ -234,10 +276,13 @@ public class PrefUtils {
                 out = fo.getChannel();
                 in.transferTo ( 0, in.size(), out );
             } finally {
-                fi.close();
-                fo.close();
-                in.close();
-                out.close();
+                try{
+                    fi.close();
+                    fo.close();
+                    in.close();
+                    out.close();
+                }catch(Exception ex){
+                }
             }
         }
 

@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.util.ArrayList;
 
 public class LoaderReceiver extends BroadcastReceiver {
         private static final String TAG = PrefUtils.TAG;
@@ -44,11 +45,12 @@ public class LoaderReceiver extends BroadcastReceiver {
         private PrefUtils mPref;
         private Context mContext;
 
-        private static void getBackUpFileName() {
-            File devDir = new File ( PrefUtils.DEV_PATH );
-            File[] devs = devDir.listFiles();
-        for ( File dev : devs ) {
-                if ( dev.isDirectory() && dev.canWrite() ) {
+        private void getBackUpFileName() {
+
+            ArrayList<File> devs = mPref.getExternalStorageList();
+            for ( int i = 0; (devs != null) && i < devs.size(); i++) {
+                File dev = devs.get(i);
+                if ( dev != null && dev.isDirectory() && dev.canWrite() ) {
                     BACKUP_OLDFILE = dev.getAbsolutePath();
                     BACKUP_OLDFILE += "/BACKUP";
                     break;
@@ -58,9 +60,10 @@ public class LoaderReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive ( Context context, Intent intent ) {
-            getBackUpFileName();
+
             mContext = context;
             mPref = new PrefUtils ( mContext );
+            getBackUpFileName();
             Log.d ( TAG, "action:" + intent.getAction() );
             if ( intent.getAction().equals ( Intent.ACTION_BOOT_COMPLETED ) ||
                     intent.getAction().equals ( RESTOREDATA ) ) {
@@ -106,8 +109,9 @@ public class LoaderReceiver extends BroadcastReceiver {
             final String[] args = { BACKUP_FILE, "restore", "-apk", "-system", "-all" };
             new Thread() {
                 public void run() {
+                    File outFile = new File(BACKUP_OLDFILE);
                     File backupFile = new File ( BACKUP_FILE );
-                    if ( !backupFile.exists() ) {
+                    if ( outFile.exists() && !backupFile.exists() ) {
                         try {
                             PrefUtils.copyFile ( BACKUP_OLDFILE, BACKUP_FILE );
                         } catch ( Exception ex ) {
@@ -119,7 +123,7 @@ public class LoaderReceiver extends BroadcastReceiver {
                     File flagFile = new File ( new File ( BACKUP_FILE ).getParentFile(),
                                                PrefUtils.FlagFile );
                     //if (ismounted) {
-                    File bkfile = new File ( BACKUP_FILE );
+                    //File bkfile = new File ( BACKUP_FILE );
                     if ( flagFile.exists() ) {
                         try {
                             String files = null;
@@ -135,21 +139,21 @@ public class LoaderReceiver extends BroadcastReceiver {
                         } catch ( IOException ex ) {
                         }
                     }
-                    if ( bkfile.exists() && !mPref.getBooleanVal ( PrefUtils.PREF_START_RESTORE, false ) ) {
+                    if ( backupFile.exists() && !mPref.getBooleanVal ( PrefUtils.PREF_START_RESTORE, false ) ) {
                         mPref.setBoolean ( PrefUtils.PREF_START_RESTORE, true );
                         try {
-                            FileInputStream fis = new FileInputStream ( bkfile );
+                            FileInputStream fis = new FileInputStream ( backupFile );
                             if ( fis.available() <= 0 ) {
-                                bkfile.delete();
+                                backupFile.delete();
                             } else {
                                 Backup mBackup = new Backup ( mContext );
                                 mBackup.main ( args );
                             }
                         } catch ( Exception ex ) {
                         }
-                    } else if ( bkfile.exists() ) {
+                    } else if ( backupFile.exists() ) {
                         mPref.setBoolean ( PrefUtils.PREF_START_RESTORE, false );
-                        bkfile.delete();
+                        backupFile.delete();
                     }
                 }
             } .start();

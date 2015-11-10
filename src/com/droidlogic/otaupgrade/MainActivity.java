@@ -31,7 +31,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemProperties;
-
+import android.os.storage.DiskInfo;
 import android.util.Log;
 
 import android.view.LayoutInflater;
@@ -50,13 +50,11 @@ import android.widget.Toast;
 
 import com.amlogic.update.OtaUpgradeUtils;
 
-import org.apache.http.util.EncodingUtils;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 
@@ -360,13 +358,18 @@ public class MainActivity extends Activity implements OnClickListener {
 
         res += "--update_package=";
 
-        if (Environment.MEDIA_MOUNTED.equals(
-                    Environment.getExternalStorageState()) &&
-                FileSelector.isSdcard(fullpath)) {
-            res += "/sdcard/";
-        } else if (FileSelector.isUdisk(fullpath)) {
-            res += "/udisk/";
-        } else {
+        DiskInfo info = mPreference.getDiskInfo(fullpath);
+        if ( info != null) {
+            if ( info.isSd() ) {
+                res += "/sdcard/";
+            }else if ( info.isUsb() ) {
+                res += "/udisk/";
+            }else {
+                res += "/cache/";
+                UpdateMode = OtaUpgradeUtils.UPDATE_UPDATE;
+            }
+        }else {
+            res += "/cache/";
             UpdateMode = OtaUpgradeUtils.UPDATE_UPDATE;
         }
 
@@ -389,6 +392,16 @@ public class MainActivity extends Activity implements OnClickListener {
         return true;
     }
 
+    public static String getString(final byte[] data, final String charset) {
+        if (data == null) {
+            throw new IllegalArgumentException("Parameter may not be null");
+        }
+        try {
+            return new String(data, 0, data.length, charset);
+        } catch (UnsupportedEncodingException e) {
+            return new String(data, 0, data.length);
+        }
+    }
     public String getFromAssets(String fileName) {
         String result = "";
 
@@ -397,7 +410,7 @@ public class MainActivity extends Activity implements OnClickListener {
             int lenght = in.available();
             byte[] buffer = new byte[lenght];
             in.read(buffer);
-            result = EncodingUtils.getString(buffer, ENCODING);
+            result = getString(buffer,"US-ASCII");
         } catch (Exception e) {
             e.printStackTrace();
         }
