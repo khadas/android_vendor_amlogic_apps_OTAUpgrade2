@@ -33,6 +33,9 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
         </activity>
         <activity
             android:name="com.droidlogic.otaupgrade.FileSelector"
@@ -44,6 +47,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.android.otaupdate.aml.backup" />
                 <action android:name="com.android.otaupdate.aml.restore" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
         </receiver>
 
@@ -65,6 +69,10 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.settings.SYSTEM_UPDATE_SETTINGS" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
