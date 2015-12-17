@@ -109,9 +109,10 @@ public class FileSelector extends Activity implements OnItemClickListener {
             setContentView ( R.layout.file_list );
             mListView = ( ListView ) findViewById ( R.id.file_list );
             mListView.setAdapter ( mAdapter );
-            startScanThread();
+
             mListView.setOnItemClickListener ( this );
             mPrefUtil = new PrefUtils(this);
+            startScanThread();
         }
 
         @Override
