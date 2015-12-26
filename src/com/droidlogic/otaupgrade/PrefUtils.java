@@ -190,6 +190,30 @@ public class PrefUtils {
             return null;
         }
 
+        public String getTransPath(String inPath) {
+            String outPath = inPath;
+            String pathLast;
+            String pathVol;
+            int idx = -1;
+            int len;
+
+            StorageManager storageManager = (StorageManager)mContext.getSystemService(Context.STORAGE_SERVICE);
+            List<VolumeInfo> volumes = storageManager.getVolumes();
+            Collections.sort(volumes, VolumeInfo.getDescriptionComparator());
+            for (VolumeInfo vol : volumes) {
+                if (vol != null && vol.isMountedReadable() && vol.getType() == VolumeInfo.TYPE_PUBLIC) {
+                    pathVol = vol.getPath().getAbsolutePath();
+                    idx = inPath.indexOf(pathVol);
+                    if (idx != -1) {
+                        len = pathVol.length();
+                        pathLast = inPath.substring(idx + len);
+                        outPath = storageManager.getBestVolumeDescription(vol) + pathLast;
+                    }
+                }
+            }
+
+            return outPath;
+        }
 
         void write2File() {
             ArrayList<File> externalDevs =  getExternalStorageList();

@@ -194,7 +194,14 @@ public class FileSelector extends Activity implements OnItemClickListener {
                     TextView tv = ( TextView ) convertView;
                     File file = mFiles[position];
                     String name = file.getPath();
-                    tv.setText ( name );
+                    String nameDest = null;
+                    if (mPrefUtil != null) {
+                        nameDest = mPrefUtil.getTransPath(name);
+                    }
+                    else {
+                        nameDest = name;
+                    }
+                    tv.setText ( nameDest );
                     return tv;
                 }
         }
