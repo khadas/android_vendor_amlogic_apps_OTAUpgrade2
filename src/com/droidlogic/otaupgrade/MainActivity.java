@@ -410,7 +410,7 @@ public class MainActivity extends Activity implements OnClickListener {
             int lenght = in.available();
             byte[] buffer = new byte[lenght];
             in.read(buffer);
-            result = getString(buffer,"US-ASCII");
+            result = getString(buffer,"UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
         }
