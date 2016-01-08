@@ -90,7 +90,7 @@ public class InstallPackage extends LinearLayout implements OtaUpgradeUtils.Prog
                     new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                PrefUtils.copyBKFile();
+                                mPref.copyBKFile();
                                 mUpdateUtils.upgrade(new File(mPackagePath),
                                     InstallPackage.this, mUpdateMode);
                             }
