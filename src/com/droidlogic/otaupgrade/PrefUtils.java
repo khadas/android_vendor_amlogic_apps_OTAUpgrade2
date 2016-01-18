@@ -214,18 +214,22 @@ public class PrefUtils {
 
             return outPath;
         }
-
-        void write2File() {
+        private String getCanWritePath(){
             ArrayList<File> externalDevs =  getExternalStorageList();
-            String flagParentPath = null;
+            String filePath = null;
             for ( int j = 0; (externalDevs != null) && j < externalDevs.size(); j++ ) {
                 File dir = externalDevs.get(j);
                 if ( dir.isDirectory() && dir.canWrite() ) {
-                    flagParentPath = dir.getAbsolutePath();
-                    flagParentPath += "/";
+                    filePath = dir.getAbsolutePath();
+                    filePath += "/";
                     break;
                 }
             }
+            return filePath;
+        }
+
+        void write2File() {
+            String flagParentPath = getCanWritePath();
             if ( flagParentPath == null ) {
                 return;
             }
@@ -264,28 +268,30 @@ public class PrefUtils {
             }
         }
 
-        public static void copyBKFile() {
+        public void copyBKFile() {
             String backupInrFile = "/data/data/com.droidlogic.otaupgrade/BACKUP";
-            String backupOutFile = "";
-            if ( new File ( backupInrFile ).exists() ) {
-                File devDir = new File ( PrefUtils.DEV_PATH );
-                File[] devs = devDir.listFiles();
-            for ( File dev : devs ) {
-                    if ( dev.isDirectory() && dev.canWrite() ) {
-                        backupOutFile = dev.getAbsolutePath();
-                        backupOutFile += "/BACKUP";
-                        break;
-                    }
+            String backupOutFile = getCanWritePath();
+
+            if ( new File ( backupInrFile ).exists() && backupOutFile != null ) {
+                File dev = new File ( backupOutFile );
+                if ( dev == null || !dev.canWrite() ) {
+                    return;
                 }
-                if ( !backupOutFile.equals ( "" ) ) {
-                    try {
-                        copyFile ( backupInrFile, backupOutFile );
-                    } catch ( Exception ex ) {
-                        ex.printStackTrace();
+               if ( dev.isDirectory() && dev.canWrite() && !dev.getName().startsWith(".") ) {
+                    backupOutFile = dev.getAbsolutePath();
+                    backupOutFile += "/BACKUP";
+                    Log.d("OTA","back backupOutFile=null"+backupOutFile);
+                    if ( !backupOutFile.equals ( "" ) ) {
+                        try {
+                            copyFile ( backupInrFile, backupOutFile );
+                        } catch ( Exception ex ) {
+                            ex.printStackTrace();
+                        }
                     }
                 }
             }
         }
+
         public static  void copyFile ( String fileFromPath, String fileToPath ) throws Exception {
 
             FileInputStream fi = null;
