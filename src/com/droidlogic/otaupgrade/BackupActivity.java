@@ -18,12 +18,12 @@ package com.droidlogic.otaupgrade;
 import android.app.Activity;
 
 import android.content.Intent;
-
+import android.os.Handler;
 import android.os.Bundle;
 import android.os.Environment;
-
+import android.widget.Toast;
 import com.amlogic.update.Backup;
-
+import com.amlogic.update.Backup.IBackupConfirmListener;
 import java.io.File;
 
 
@@ -35,12 +35,14 @@ import java.io.File;
  * @Author
  * @Version V1.0
  */
-public class BackupActivity extends Activity {
+public class BackupActivity extends Activity implements IBackupConfirmListener{
     public static String BACKUP_FILE = "/data/data/com.droidlogic.otaupgrade/BACKUP";
+
     public static final String SdcardDir = "/storage/external_storage/sdcard1/";
     public static final int FUNCBACKUP = 1;
     public static final int FUNCRESTORE = 2;
     public static int func = 0;
+    public Handler mHandler;
 
     /*private static void getBackUpFileName() {
         File devDir = new File(PrefUtils.DEV_PATH);
@@ -59,8 +61,9 @@ public class BackupActivity extends Activity {
     @Override
     protected void onCreate(Bundle icicle) {
         //getBackUpFileName();
-        super.onCreate(icicle);
 
+        super.onCreate(icicle);
+        mHandler = new Handler();
         boolean flag = false;
         String act = getIntent().getAction();
 
@@ -86,6 +89,10 @@ public class BackupActivity extends Activity {
                 Activity activity = (Activity) this;
                 startActivityForResult(intent0, 1);
             } else {
+                if (!new File(BACKUP_FILE).exists()) {
+                    Toast.makeText ( BackupActivity.this.getApplicationContext(), getString ( R.string.prepare_waitting ), 5000 )
+                        .show();
+                }
                 Restore();
             }
         }
@@ -95,6 +102,29 @@ public class BackupActivity extends Activity {
             setResult(1, intent);
             finish();
         }
+    }
+    public void onBackupComplete() {
+        if ( android.os.Build.VERSION.SDK_INT > 20 ) {
+            if (mHandler != null) {
+                mHandler.post(new Runnable(){
+                    public void run(){
+                        Toast.makeText ( BackupActivity.this.getApplicationContext(), getString ( R.string.remove_hit ), 5000 )
+                        .show();
+                    }
+                });
+            }
+            PrefUtils util = new PrefUtils(this);
+            util.copyBKFile();
+        }
+        Intent intent = new Intent ( MainActivity.RESULT_BACKUP );
+        intent.setClass ( this, MainActivity.class );
+        startActivity ( intent );
+    }
+
+    public void onRestoreComplete() {
+        Intent intent = new Intent ( MainActivity.RESULT_RESTORE );
+        intent.setClass ( this, MainActivity.class );
+        startActivity ( intent );
     }
 
     @Override
@@ -134,11 +164,12 @@ public class BackupActivity extends Activity {
     private void Backup() {
         new Thread() {
                 final String[] args = {
-                        BACKUP_FILE, "backup", "-apk", "-system", "-all"
+                        BACKUP_FILE, "backup", "-apk", "-system","-widget","-compress", "-noshared"
                     };
 
                 public void run() {
                     Backup mBackup = new Backup(BackupActivity.this);
+                    mBackup.setConfirmListener ( BackupActivity.this );
                     mBackup.main(args);
                 }
             }.start();
@@ -147,11 +178,14 @@ public class BackupActivity extends Activity {
     private void Restore() {
         new Thread() {
                 final String[] args = {
-                        BACKUP_FILE, "restore", "-apk", "-system", "-all"
+                        BACKUP_FILE, "restore", "-apk", "-system","-widget","-compress", "-noshared"
                     };
 
                 public void run() {
+                    PrefUtils pref = new PrefUtils(BackupActivity.this);
+                    pref.copyBackup(false);
                     Backup mBackup = new Backup(BackupActivity.this);
+                    mBackup.setConfirmListener ( BackupActivity.this );
                     mBackup.main(args);
                 }
             }.start();

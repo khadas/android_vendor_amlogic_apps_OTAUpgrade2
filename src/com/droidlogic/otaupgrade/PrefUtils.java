@@ -268,28 +268,32 @@ public class PrefUtils {
             }
         }
 
-        public void copyBKFile() {
+        public void copyBackup(boolean outside){
             String backupInrFile = "/data/data/com.droidlogic.otaupgrade/BACKUP";
             String backupOutFile = getCanWritePath();
 
-            if ( new File ( backupInrFile ).exists() && backupOutFile != null ) {
-                File dev = new File ( backupOutFile );
-                if ( dev == null || !dev.canWrite() ) {
-                    return;
-                }
-               if ( dev.isDirectory() && dev.canWrite() && !dev.getName().startsWith(".") ) {
-                    backupOutFile = dev.getAbsolutePath();
-                    backupOutFile += "/BACKUP";
-                    Log.d("OTA","back backupOutFile=null"+backupOutFile);
-                    if ( !backupOutFile.equals ( "" ) ) {
-                        try {
+            File dev = new File ( backupOutFile );
+            if ( dev == null || !dev.canWrite() ) {
+                return;
+            }
+           if ( dev.isDirectory() && dev.canWrite() && !dev.getName().startsWith(".") ) {
+                backupOutFile = dev.getAbsolutePath();
+                backupOutFile += "/BACKUP";
+                if ( !backupOutFile.equals ( "" ) ) {
+                    try {
+                        if ( outside )
                             copyFile ( backupInrFile, backupOutFile );
-                        } catch ( Exception ex ) {
-                            ex.printStackTrace();
-                        }
+                        else
+                            copyFile ( backupOutFile, backupInrFile);
+                    } catch ( Exception ex ) {
+                        ex.printStackTrace();
                     }
                 }
             }
+        }
+
+        public void copyBKFile() {
+            copyBackup(true);
         }
 
         public static  void copyFile ( String fileFromPath, String fileToPath ) throws Exception {

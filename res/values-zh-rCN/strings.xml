@@ -96,6 +96,10 @@
     <string name="copy_failed_restart">"复制升级文件到:%s失败,重新复制"</string>
     <string name="prepare_copy">"准备复制升级文件"</string>
     <string name="start_copy">"开始复制升级文件"</string>
-	<string name="scan_title">扫描</string>
-	<string name="scan_tip">扫描中,请等待...</string>
+    <string name="scan_title">扫描</string>
+    <string name="scan_tip">扫描中,请等待...</string>
+    <string name="backup_result">备份完成</string>
+    <string name="restore_result">备份已经恢复</string>
+    <string name="remove_hit">"保证外设连接正常，否则备份转存失败"</string>
+    <string name="prepare_waitting">"数据准备中，确认您的外设中有备份文件"</string>
 </resources>

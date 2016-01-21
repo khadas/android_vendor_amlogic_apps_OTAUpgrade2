@@ -106,7 +106,7 @@ public class LoaderReceiver extends BroadcastReceiver {
         }
 
         private void afterReboot() {
-            final String[] args = { BACKUP_FILE, "restore", "-apk", "-system", "-all" };
+            final String[] args = { BACKUP_FILE,"restore", "-apk", "-system","-widget","-compress", "-noshared" };
             new Thread() {
                 public void run() {
                     File outFile = new File(BACKUP_OLDFILE);
@@ -160,7 +160,7 @@ public class LoaderReceiver extends BroadcastReceiver {
         }
 
         private void backup() {
-            final String[] args = { BACKUP_FILE, "backup", "-apk", "-system", "-all" };
+            final String[] args = { BACKUP_FILE, "backup", "-apk", "-system","-widget","-compress", "-noshared"};
             Backup mBackup = new Backup ( mContext );
             mBackup.main ( args );
         }

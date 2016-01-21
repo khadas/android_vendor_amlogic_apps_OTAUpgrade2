@@ -96,5 +96,9 @@
     <string name="start_copy">Copying...</string>
     <string name="copy_failed_restart">Copy Files to Exteranl Storage:%s Failed,Restart Copying</string>
 	<string name="scan_title">Scanning</string>
-	<string name="scan_tip">Scanning,Please wait...</string>
+    <string name="scan_tip">Scanning,Please wait...</string>
+    <string name="backup_result">backup finish</string>
+    <string name="restore_result">restore finish</string>
+    <string name="remove_hit">backup will save to external storage if exists or backup save fail</string>
+    <string name="prepare_waitting">"prepare,make sure BACKUP file in your external storage"</string>
 </resources>

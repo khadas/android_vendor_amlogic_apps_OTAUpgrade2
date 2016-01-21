@@ -80,7 +80,8 @@ public class MainActivity extends Activity implements OnClickListener {
     private Button mUpdateCertern;
     private CheckBox mWipeDate;
     private CheckBox mWipeMedia;
-
+    public static final String RESULT_BACKUP = "com.droidlogic.backupresult";
+    public static final String RESULT_RESTORE = "com.droidlogic.restoreresult";
     //private CheckBox mWipeCache;
     private TextView filepath;
     private TextView filename;
@@ -246,6 +247,14 @@ public class MainActivity extends Activity implements OnClickListener {
             if (vg != null) {
                 vg.setVisibility(View.GONE);
             }
+        }
+        String act = getIntent().getAction();
+        if ( RESULT_BACKUP.equals ( act ) ) {
+            Toast.makeText ( this, getString ( R.string.backup_result ), 5000 )
+            .show();
+        } else if ( RESULT_RESTORE.equals ( act ) ) {
+            Toast.makeText ( this, getString ( R.string.restore_result ), 2000 )
+            .show();
         }
     }
 
