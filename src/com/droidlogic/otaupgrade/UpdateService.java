@@ -62,6 +62,7 @@ public class UpdateService extends Service {
     private UpdateTasks mDownloadTask;
     private Notifier notice = new DownloadNotify();
     private Context mContext = null;
+    private PrefUtils mPrefUtils;
     private TimerTask autoCheckTask = new TimerTask() {
             public void run() {
                 if ((mDownloadTask.getRunningStatus() != UpdateTasks.RUNNING_STATUS_RUNNING) &&
@@ -116,6 +117,7 @@ public class UpdateService extends Service {
     private void initInstance() {
         if (mCheckingTask == null) {
             mCheckingTask = new CheckUpdateTask(this);
+            ((CheckUpdateTask)mCheckingTask).setCallbacks(mPrefUtils);
         }
 
         if (mDownloadTask == null) {
@@ -128,8 +130,10 @@ public class UpdateService extends Service {
     public void onCreate() {
         super.onCreate();
         mContext = getBaseContext();
+        mPrefUtils = new PrefUtils(mContext);
         initInstance();
     }
+
 
     public class uiBinder extends Binder {
         public boolean resetTask(int taskId) {

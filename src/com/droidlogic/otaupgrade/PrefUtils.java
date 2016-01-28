@@ -22,21 +22,25 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import com.amlogic.update.CheckUpdateTask;
 
 import android.os.storage.VolumeInfo;
 import android.os.storage.DiskInfo;
 import android.os.storage.StorageManager;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.nio.channels.FileChannel;
-
+import com.amlogic.update.OtaUpgradeUtils;
 /**
  * @ClassName PrefUtils
  * @Description TODO
@@ -45,9 +49,10 @@ import java.nio.channels.FileChannel;
  * @Author
  * @Version V1.0
  */
-public class PrefUtils {
-        public static Boolean DEBUG = true;
+public class PrefUtils implements CheckUpdateTask.CheckPathCallBack{
+        public static Boolean DEBUG = false;
         public static final String TAG = "OTA";
+        public static final String EXTERNAL_STORAGE = "/external_storage/";
         private static final String PREFS_DOWNLOAD_FILELIST = "download_filelist";
         private static final String PREFS_UPDATE_FILEPATH = "update_file_path";
         private static final String PREFS_UPDATE_SCRIPT = "update_with_script";
@@ -167,7 +172,7 @@ public class PrefUtils {
             for (VolumeInfo vol : mVolumes) {
                 if (vol != null && vol.isMountedReadable() && vol.getType() == VolumeInfo.TYPE_PUBLIC) {
                     devList.add(vol.getPath());
-                    Log.d(TAG, "path.getName():" + vol.getPath().getAbsolutePath());
+                    //Log.d(TAG, "path.getName():" + vol.getPath().getAbsolutePath());
                 }
             }
             return devList;
@@ -228,6 +233,61 @@ public class PrefUtils {
             return filePath;
         }
 
+        public int createAmlScript(String fullpath, boolean wipe_data, boolean wipe_cache) {
+            File file;
+            String res = "";
+            int UpdateMode = OtaUpgradeUtils.UPDATE_UPDATE;
+            file = new File("/cache/recovery/command");
+
+            try {
+                File parent = file.getParentFile();
+
+                if (!parent.exists()) {
+                    parent.mkdirs();
+                }
+
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            res += "--update_package=";
+
+            DiskInfo info = getDiskInfo(fullpath);
+            if ( info != null) {
+                if ( info.isSd() ) {
+                    res += "/sdcard/";
+                }else if ( info.isUsb() ) {
+                    res += "/udisk/";
+                }else {
+                    res += "/cache/";
+                    UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
+                }
+            }else {
+                res += "/cache/";
+                UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
+            }
+
+            res += new File(fullpath).getName();
+            res += ("\n--locale=" + Locale.getDefault().toString());
+            res += (wipe_data? "\n--wipe_data" : "");
+            res += (wipe_cache? "\n--wipe_media" : "");
+
+            //res += (mWipeCache.isChecked() ? "\n--wipe_cache" : "");
+            try {
+                FileOutputStream fout = new FileOutputStream(file);
+                byte[] buffer = res.getBytes();
+                fout.write(buffer);
+                fout.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.d(TAG, "IOException:" + this.getClass());
+            }
+            return UpdateMode;
+        }
+
         void write2File() {
             String flagParentPath = getCanWritePath();
             if ( flagParentPath == null ) {
@@ -272,6 +332,7 @@ public class PrefUtils {
             String backupInrFile = "/data/data/com.droidlogic.otaupgrade/BACKUP";
             String backupOutFile = getCanWritePath();
 
+
             File dev = new File ( backupOutFile );
             if ( dev == null || !dev.canWrite() ) {
                 return;
@@ -295,6 +356,17 @@ public class PrefUtils {
         public void copyBKFile() {
             copyBackup(true);
         }
+
+
+
+        public String onExternalPathSwitch(String filePath) {
+            if ( filePath.contains(EXTERNAL_STORAGE) || filePath.contains(EXTERNAL_STORAGE.toUpperCase()) ) {
+                filePath = filePath.replace(EXTERNAL_STORAGE,getCanWritePath());
+                return filePath;
+            }
+            return filePath;
+        }
+
 
         public static  void copyFile ( String fileFromPath, String fileToPath ) throws Exception {
 

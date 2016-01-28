@@ -182,8 +182,10 @@ public class BackupActivity extends Activity implements IBackupConfirmListener{
                     };
 
                 public void run() {
-                    PrefUtils pref = new PrefUtils(BackupActivity.this);
-                    pref.copyBackup(false);
+                    if (!new File(BACKUP_FILE).exists()) {
+                        PrefUtils pref = new PrefUtils(BackupActivity.this);
+                        pref.copyBackup(false);
+                    }
                     Backup mBackup = new Backup(BackupActivity.this);
                     mBackup.setConfirmListener ( BackupActivity.this );
                     mBackup.main(args);

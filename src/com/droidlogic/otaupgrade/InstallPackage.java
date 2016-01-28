@@ -80,6 +80,9 @@ public class InstallPackage extends LinearLayout implements OtaUpgradeUtils.Prog
                     mUpdateUtils.registerBattery();
 
                     if (mPref != null) {
+                        if ( mPref.getScriptAsk() ) {
+                            mPref.createAmlScript(mPackagePath, true, true);
+                        }
                         mPref.write2File();
                     }
                     mDismiss.setEnabled(false);

@@ -162,45 +162,31 @@ public class UpdateActivity extends Activity {
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction()
                               .equals("android.net.conn.CONNECTIVITY_CHANGE")) {
+
                     ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-                    /*NetworkInfo mobileInfo = manager
-                            .getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                    NetworkInfo wifiInfo = manager
-                            .getNetworkInfo(ConnectivityManager.TYPE_WIFI);*/
                     NetworkInfo activeInfo = manager.getActiveNetworkInfo();
-
-                    if ((activeInfo != null) && !activeInfo.isConnected()) {
-                        if (activeInfo.getState() != NetworkInfo.State.CONNECTED) {
-                            Toast.makeText(context, R.string.net_status_change,
+                    if ( activeInfo == null|| !activeInfo.isConnected()) {
+                        Toast.makeText(context, R.string.net_status_change,
                                 1).show();
-                        }
-                    }
-
-                    /*
-                    if (!wifiInfo
-                            .isConnectedOrConnecting()
-                            && Integer
-                                    .valueOf(
-                                            R.string.download_resume)
-                                    .equals(mCombineBtn
-                                            .getTag())) {
-                        mCombineBtn
-                                .setText(R.string.download_pause);
-                        mCombineBtn
-                                .setTag(Integer
-                                        .valueOf(R.string.download_pause));
-                    } else if (Integer
-                            .valueOf(
-                                    R.string.download_pause)
-                            .equals(mCombineBtn
-                                    .getTag())) {
-                        mCombineBtn
+                        if (Integer.valueOf(R.string.download_pause).equals(mCombineBtn.getTag())) {
+                            mCombineBtn
                                 .setText(R.string.download_resume);
-                        mCombineBtn
+                            mCombineBtn
                                 .setTag(Integer
                                         .valueOf(R.string.download_resume));
-                    }*/
+                            if (mServiceBinder != null) {
+                                mServiceBinder.setTaskPause(UpdateService.TASK_ID_DOWNLOAD);
+                            }
+                        }
+                    }else if ((activeInfo != null) && activeInfo.isConnected()) {
+                        mCombineBtn.setText(R.string.download_pause);
+                        mCombineBtn.setTag(Integer
+                                        .valueOf(R.string.download_pause));
+                        if (mServiceBinder != null) {
+                            mServiceBinder.setTaskResume(UpdateService.TASK_ID_DOWNLOAD);
+                        }
+                    }
                 }
             }
         };
@@ -507,7 +493,7 @@ public class UpdateActivity extends Activity {
                                         " lastProgress:" + lastProgress);
                                 }
 
-                                if (mDownSize > 0) {
+                                if (mDownSize > 0 && lastProgress > 10*1024) {
                                     mProgress.setVisibility(View.VISIBLE);
                                     mProgress.setMax((int) mDownSize);
                                     mPercent.setVisibility(View.VISIBLE);
@@ -521,6 +507,10 @@ public class UpdateActivity extends Activity {
                                         mPercent.setText(getString(
                                                 R.string.Download_succeed));
                                     }
+                                } else if (lastProgress < 10*1024) {
+                                    mPercent.setVisibility(View.VISIBLE);
+                                    mPercent.setText(getString(
+                                                R.string.scan_tip));
                                 }
 
                                 mProgress.setProgress((int) lastProgress);

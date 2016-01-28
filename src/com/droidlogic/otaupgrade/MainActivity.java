@@ -55,7 +55,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Locale;
 
 
 /**
@@ -295,15 +294,12 @@ public class MainActivity extends Activity implements OnClickListener {
         case R.id.btn_locale_certern:
 
             String fullname = filepath.getText().toString();
-
-            if ((filename != null) && (filename.length() > 0)) {
-                createAmlScript();
+            if ( fullname.lastIndexOf("/") > 0 && (filename != null) && (filename.length() > 0)) {
+                UpdateMode = mPreference.createAmlScript(fullname,mWipeDate.isChecked(),mWipeMedia.isChecked());
                 UpdateDialog(fullname);
             } else {
-                Toast.makeText(this, getString(R.string.file_not_exist), 2000)
-                     .show();
+                Toast.makeText(this, getString(R.string.file_not_exist), 2000).show();
             }
-
             break;
 
         case R.id.updatebtn:
@@ -335,70 +331,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
             return false;
         }
-    }
-
-    private boolean createAmlScript() {
-        File file;
-        String res = "";
-        String fullpath = filepath.getText().toString();
-
-        //String filedir = fullpath.substring(0,fullpath.lastIndexOf("/"));
-        if (fullpath.lastIndexOf("/") < 0) {
-            Toast.makeText(this, getString(R.string.file_not_exist), 2000).show();
-
-            return false;
-        }
-
-        file = new File("/cache/recovery/command");
-
-        try {
-            File parent = file.getParentFile();
-
-            if (!parent.exists()) {
-                parent.mkdirs();
-            }
-
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        res += "--update_package=";
-
-        DiskInfo info = mPreference.getDiskInfo(fullpath);
-        if ( info != null) {
-            if ( info.isSd() ) {
-                res += "/sdcard/";
-            }else if ( info.isUsb() ) {
-                res += "/udisk/";
-            }else {
-                res += "/cache/";
-                UpdateMode = OtaUpgradeUtils.UPDATE_UPDATE;
-            }
-        }else {
-            res += "/cache/";
-            UpdateMode = OtaUpgradeUtils.UPDATE_UPDATE;
-        }
-
-        res += filename.getText().toString();
-        res += ("\n--locale=" + Locale.getDefault().toString());
-        res += (mWipeDate.isChecked() ? "\n--wipe_data" : "");
-        res += (mWipeMedia.isChecked() ? "\n--wipe_media" : "");
-
-        //res += (mWipeCache.isChecked() ? "\n--wipe_cache" : "");
-        try {
-            FileOutputStream fout = new FileOutputStream(file);
-            byte[] buffer = res.getBytes();
-            fout.write(buffer);
-            fout.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d(TAG, "IOException:" + this.getClass());
-        }
-
-        return true;
     }
 
     public static String getString(final byte[] data, final String charset) {
