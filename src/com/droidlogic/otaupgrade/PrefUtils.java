@@ -221,7 +221,7 @@ public class PrefUtils implements CheckUpdateTask.CheckPathCallBack{
         }
         private String getCanWritePath(){
             ArrayList<File> externalDevs =  getExternalStorageList();
-            String filePath = null;
+            String filePath = "";
             for ( int j = 0; (externalDevs != null) && j < externalDevs.size(); j++ ) {
                 File dir = externalDevs.get(j);
                 if ( dir.isDirectory() && dir.canWrite() ) {
@@ -290,7 +290,7 @@ public class PrefUtils implements CheckUpdateTask.CheckPathCallBack{
 
         void write2File() {
             String flagParentPath = getCanWritePath();
-            if ( flagParentPath == null ) {
+            if ( flagParentPath.isEmpty() ) {
                 return;
             }
             File flagFile = new File ( flagParentPath, FlagFile );
@@ -334,7 +334,7 @@ public class PrefUtils implements CheckUpdateTask.CheckPathCallBack{
 
 
             File dev = new File ( backupOutFile );
-            if ( dev == null || !dev.canWrite() ) {
+            if ( backupOutFile.isEmpty() || dev == null || !dev.canWrite() ) {
                 return;
             }
            if ( dev.isDirectory() && dev.canWrite() && !dev.getName().startsWith(".") ) {
