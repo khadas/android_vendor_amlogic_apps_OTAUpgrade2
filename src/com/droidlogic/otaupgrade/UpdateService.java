@@ -117,11 +117,11 @@ public class UpdateService extends Service {
     private void initInstance() {
         if (mCheckingTask == null) {
             mCheckingTask = new CheckUpdateTask(this);
-            ((CheckUpdateTask)mCheckingTask).setCallbacks(mPrefUtils);
         }
 
         if (mDownloadTask == null) {
             mDownloadTask = new DownloadUpdateTask(this);
+            ((DownloadUpdateTask) mDownloadTask).setCallbacks(mPrefUtils);
             ((DownloadUpdateTask) mDownloadTask).setNotify(notice);
         }
     }

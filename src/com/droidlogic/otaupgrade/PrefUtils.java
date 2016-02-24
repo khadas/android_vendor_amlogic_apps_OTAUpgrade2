@@ -22,7 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import com.amlogic.update.CheckUpdateTask;
+import com.amlogic.update.DownloadUpdateTask;
 
 import android.os.storage.VolumeInfo;
 import android.os.storage.DiskInfo;
@@ -49,7 +49,7 @@ import com.amlogic.update.OtaUpgradeUtils;
  * @Author
  * @Version V1.0
  */
-public class PrefUtils implements CheckUpdateTask.CheckPathCallBack{
+public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
         public static Boolean DEBUG = false;
         public static final String TAG = "OTA";
         public static final String EXTERNAL_STORAGE = "/external_storage/";
@@ -135,7 +135,9 @@ public class PrefUtils implements CheckUpdateTask.CheckPathCallBack{
         }
 
         public String getUpdatePath() {
-            return mPrefs.getString ( PREFS_UPDATE_FILEPATH, null );
+            String path = mPrefs.getString ( PREFS_UPDATE_FILEPATH, null );
+            path = onExternalPathSwitch(path);
+            return path;
         }
 
         public long getFileSize() {
@@ -361,8 +363,10 @@ public class PrefUtils implements CheckUpdateTask.CheckPathCallBack{
 
         public String onExternalPathSwitch(String filePath) {
             if ( filePath.contains(EXTERNAL_STORAGE) || filePath.contains(EXTERNAL_STORAGE.toUpperCase()) ) {
-                filePath = filePath.replace(EXTERNAL_STORAGE,getCanWritePath());
-                return filePath;
+                String path = getCanWritePath();
+                if ( path != null && !path.isEmpty() ) {
+                    filePath = filePath.replace(EXTERNAL_STORAGE,path);
+                }
             }
             return filePath;
         }
