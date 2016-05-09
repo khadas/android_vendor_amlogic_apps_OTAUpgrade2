@@ -296,16 +296,17 @@ public class UpdateService extends Service {
             NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
             Intent intent = new Intent(mContext, UpdateActivity.class);
             intent.setAction(ACTION_DOWNLOAD_SUCCESS);
-
             PendingIntent contentItent = PendingIntent.getActivity(mContext, 0,
                     intent, 0);
-            Notification notification = new Notification();
-            notification.icon = R.drawable.ic_icon;
-            notification.tickerText = "Downlaod Success";
-            notification.defaults = Notification.DEFAULT_SOUND;
-            notification.setLatestEventInfo(mContext, "Upgrade",
-                "downlaod notify", contentItent);
-            notificationManager.notify(0, notification);
+            Notification.Builder notification = new Notification.Builder(mContext)
+            .setTicker(mContext.getString(R.string.noti_msg))
+            .setWhen(System.currentTimeMillis())
+            .setContentTitle(mContext.getString(R.string.app_name))
+            .setContentText(mContext.getString(R.string.noti_msg))
+            .setSmallIcon(R.drawable.ic_icon)
+            .setContentIntent(contentItent);
+
+            notificationManager.notify(0, notification.getNotification());
         }
     }
 }

@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import android.os.Environment;
-import android.os.SystemProperties;
 import android.util.Log;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -24,8 +23,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import com.amlogic.update.DownloadUpdateTask;
 
-import android.os.storage.VolumeInfo;
-import android.os.storage.DiskInfo;
 import android.os.storage.StorageManager;
 import java.util.HashSet;
 import java.util.Locale;
@@ -41,6 +38,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.nio.channels.FileChannel;
 import com.amlogic.update.OtaUpgradeUtils;
+import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 /**
  * @ClassName PrefUtils
  * @Description TODO
@@ -148,10 +147,24 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
             setLong ( PREFS_UPDATE_FILESIZE, fileSize );
         }
 
+        public static Object getProperties(String key, String def) {
+            String defVal = def;
+            try {
+                Class properClass = Class.forName("android.os.SystemProperties");
+                Method getMethod = properClass.getMethod("get",String.class,String.class);
+                defVal = (String)getMethod.invoke(null,key,def);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                Log.d(TAG,"getProperty:"+key+" defVal:"+defVal);
+                return defVal;
+            }
+
+        }
         static boolean isUserVer() {
-            String userVer = SystemProperties.get ( "ro.secure", "" );
-            String userDebug = SystemProperties.get ( "ro.debuggable", "" );
-            String hideLocalUp = SystemProperties.get ( "ro.otaupdate.local", "" );
+            String userVer = (String)getProperties("ro.secure",null);//SystemProperties.get ( "ro.secure", "" );
+            String userDebug = (String)getProperties("ro.debuggable","0");//SystemProperties.get ( "ro.debuggable", "" );
+            String hideLocalUp = (String)getProperties("ro.otaupdate.local",null);//SystemProperties.get ( "ro.otaupdate.local", "" );
             if ( ( hideLocalUp != null ) && hideLocalUp.equals ( "1" ) ) {
                 if ( ( userVer != null ) && ( userVer.length() > 0 ) ) {
                     return ( userVer.trim().equals ( "1" ) ) && ( userDebug.equals ( "0" ) );
@@ -161,40 +174,75 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
         }
 
         public static boolean getAutoCheck() {
-            return ( "true" ).equals ( SystemProperties.get (
-                                           "ro.product.update.autocheck" ) );
+            String auto = (String)getProperties("ro.product.update.autocheck","false");
+            return ( "true" ).equals ( auto );
         }
 
         public ArrayList<File> getExternalStorageList(){
-            ArrayList<File> devList = new ArrayList<File>();
+            Class<?> volumeInfoC = null;
+            Method getcomparator = null;
+            Method getvolume = null;
+            Method isMount = null;
+            Method getType = null;
+            Method getPath = null;
+            List<?> mVolumes = null;
             StorageManager mStorageManager = (StorageManager)mContext.getSystemService(Context.STORAGE_SERVICE);
+            ArrayList<File> devList = new ArrayList<File>();
+            try {
+                volumeInfoC = Class.forName("android.os.storage.VolumeInfo");
+                getcomparator = volumeInfoC.getMethod("getDescriptionComparator");
+                getvolume = StorageManager.class.getMethod("getVolumes");
+                isMount = volumeInfoC.getMethod("isMountedReadable");
+                getType = volumeInfoC.getMethod("getType");
+                getPath = volumeInfoC.getMethod("getPath");
+                mVolumes = (List<?>)getvolume.invoke(mStorageManager);
 
-            List<VolumeInfo> mVolumes = mStorageManager.getVolumes();
-            Collections.sort(mVolumes, VolumeInfo.getDescriptionComparator());
-            for (VolumeInfo vol : mVolumes) {
-                if (vol != null && vol.isMountedReadable() && vol.getType() == VolumeInfo.TYPE_PUBLIC) {
-                    devList.add(vol.getPath());
-                    //Log.d(TAG, "path.getName():" + vol.getPath().getAbsolutePath());
+                for (Object vol : mVolumes) {
+                    if (vol != null && (boolean)isMount.invoke(vol) && (int)getType.invoke(vol) == 0) {
+                        devList.add((File)getPath.invoke(vol));
+                        Log.d(TAG, "path.getName():" + getPath.invoke(vol));
+                    }
                 }
+            }catch (Exception ex) {
+                ex.printStackTrace();
+            }finally {
+                return devList;
             }
-            return devList;
         }
 
-        public DiskInfo getDiskInfo(String filePath){
+        public Object getDiskInfo(String filePath){
             StorageManager mStorageManager = (StorageManager)mContext.getSystemService(Context.STORAGE_SERVICE);
-
-            List<VolumeInfo> mVolumes = mStorageManager.getVolumes();
-            Collections.sort(mVolumes, VolumeInfo.getDescriptionComparator());
-            for ( VolumeInfo vol : mVolumes ) {
-                if ( vol != null && vol.isMountedReadable() ) {
-                    DiskInfo info = vol.getDisk();
-                    if ( info != null && filePath.contains(vol.getPath().getAbsolutePath()) ) {
-                        return info;
+            Class<?> volumeInfoC = null;
+            Class<?> deskInfoC = null;
+            Method getcomparator = null;
+            Method getvolume = null;
+            Method getDisk = null;
+            Method isMount = null;
+            Method getPath = null;
+            List<?> mVolumes = null;
+            try {
+                volumeInfoC = Class.forName("android.os.storage.VolumeInfo");
+                deskInfoC = Class.forName("android.os.storage.DiskInfo");
+                getcomparator = volumeInfoC.getMethod("getDescriptionComparator");
+                getvolume = StorageManager.class.getMethod("getVolumes");
+                mVolumes = (List<?>)getvolume.invoke(mStorageManager);//mStorageManager.getVolumes();
+                isMount = volumeInfoC.getMethod("isMountedReadable");
+                getDisk = volumeInfoC.getMethod("getDisk");
+                getPath = volumeInfoC.getMethod("getPath");
+                for (Object vol : mVolumes) {
+                    if (vol != null && (boolean)isMount.invoke(vol)) {
+                        Object info = getDisk.invoke(vol);
+                        if ( info != null && filePath.contains(((File)getPath.invoke(vol)).getAbsolutePath()) ) {
+                            return info;
+                        }
+                        Log.d(TAG, "path.getName():" +((File)getPath.invoke(vol)).getAbsolutePath());
                     }
-                    Log.d(TAG, "path.getName():" + vol.getPath().getAbsolutePath());
                 }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                return null;
             }
-            return null;
         }
 
         public String getTransPath(String inPath) {
@@ -203,23 +251,39 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
             String pathVol;
             int idx = -1;
             int len;
-
+            Class<?> volumeInfoC = null;
+            Method getBestVolumeDescription = null;
+            Method getVolumes = null;
+            Method getType = null;
+            Method isMount = null;
+            Method getPath = null;
+            List<?> volumes = null;
             StorageManager storageManager = (StorageManager)mContext.getSystemService(Context.STORAGE_SERVICE);
-            List<VolumeInfo> volumes = storageManager.getVolumes();
-            Collections.sort(volumes, VolumeInfo.getDescriptionComparator());
-            for (VolumeInfo vol : volumes) {
-                if (vol != null && vol.isMountedReadable() && vol.getType() == VolumeInfo.TYPE_PUBLIC) {
-                    pathVol = vol.getPath().getAbsolutePath();
-                    idx = inPath.indexOf(pathVol);
-                    if (idx != -1) {
-                        len = pathVol.length();
-                        pathLast = inPath.substring(idx + len);
-                        outPath = storageManager.getBestVolumeDescription(vol) + pathLast;
+            try {
+                volumeInfoC = Class.forName("android.os.storage.VolumeInfo");
+                getVolumes = StorageManager.class.getMethod("getVolumes",StorageManager.class);
+                volumes = (List)getVolumes.invoke(storageManager);
+                isMount = volumeInfoC.getMethod("isMountedReadable");
+                getType = volumeInfoC.getMethod("getType");
+                getPath = volumeInfoC.getMethod("getPath");
+                for (Object vol : volumes) {
+                    if (vol != null && (boolean)isMount.invoke(vol) && (int)getType.invoke(vol,"") == 0) {
+                        pathVol = ((File)getPath.invoke(vol)).getAbsolutePath();
+                        idx = inPath.indexOf(pathVol);
+                        if (idx != -1) {
+                            len = pathVol.length();
+                            pathLast = inPath.substring(idx + len);
+                            getBestVolumeDescription = StorageManager.class.getMethod("getBestVolumeDescription",volumeInfoC);
+
+                            outPath = ((String)getBestVolumeDescription.invoke(storageManager,vol)) + pathLast;
+                        }
                     }
                 }
+            } catch (Exception ex) {
+            } finally {
+                return outPath;
             }
 
-            return outPath;
         }
         private String getCanWritePath(){
             ArrayList<File> externalDevs =  getExternalStorageList();
@@ -256,18 +320,28 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
             }
 
             res += "--update_package=";
-
-            DiskInfo info = getDiskInfo(fullpath);
-            if ( info != null) {
-                if ( info.isSd() ) {
-                    res += "/sdcard/";
-                }else if ( info.isUsb() ) {
-                    res += "/udisk/";
-                }else {
+            Class<?> deskInfoClass = null;
+            Method isSd = null;
+            Method isUsb = null;
+            Object info = getDiskInfo(fullpath);
+            try {
+                deskInfoClass = Class.forName("android.os.storage.DeskInfo");
+                isSd = deskInfoClass.getMethod("isSd()");
+                if ( info != null ) {
+                    if ( (boolean)isSd.invoke(info) ) {
+                        res += "/sdcard/";
+                    }else if ( (boolean)isUsb.invoke(info) ) {
+                        res += "/udisk/";
+                    }else {
+                        res += "/cache/";
+                        UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
+                    }
+                } else {
                     res += "/cache/";
                     UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
                 }
-            }else {
+
+            } catch (Exception ex) {
                 res += "/cache/";
                 UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
             }

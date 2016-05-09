@@ -14,10 +14,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import android.net.wifi.WifiManager;
-
+import android.os.Bundle;
 import android.os.Environment;
-import android.os.SystemProperties;
-
 import android.util.Log;
 
 import com.amlogic.update.Backup;
@@ -77,8 +75,8 @@ public class LoaderReceiver extends BroadcastReceiver {
             }
             //Log.d(TAG,"getAction:"+intent.getAction());
             if ( ( ConnectivityManager.CONNECTIVITY_ACTION ).equals ( intent.getAction() ) ) {
-                NetworkInfo netInfo = ( NetworkInfo ) intent.getExtra ( WifiManager.EXTRA_NETWORK_INFO,
-                                      null );
+                Bundle bundle = intent.getExtras();
+                NetworkInfo netInfo = ( NetworkInfo )bundle.getParcelable( WifiManager.EXTRA_NETWORK_INFO);
                 if ( PrefUtils.DEBUG ) {
                     Log.d ( TAG,
                             "BootCompleteFlag" +
@@ -95,8 +93,8 @@ public class LoaderReceiver extends BroadcastReceiver {
                         mContext.startService ( new Intent (
                                                     UpdateService.ACTION_AUTOCHECK ) );
                         return;
-                    } else if ( ( "true" ).equals ( SystemProperties.getBoolean (
-                                                        "ro.product.update.autocheck", false ) ) ) {
+                    } else if ( ( "true" ).equals ( PrefUtils.getProperties (
+                                                        "ro.product.update.autocheck", "false" ) ) ) {
                         mPref.setBoolean ( PrefUtils.PREF_AUTO_CHECK, true );
                         mContext.startService ( new Intent (
                                                     UpdateService.ACTION_AUTOCHECK ) );

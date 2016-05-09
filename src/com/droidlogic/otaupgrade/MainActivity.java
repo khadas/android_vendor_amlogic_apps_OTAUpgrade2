@@ -30,8 +30,6 @@ import android.net.NetworkInfo;
 
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.SystemProperties;
-import android.os.storage.DiskInfo;
 import android.util.Log;
 
 import android.view.LayoutInflater;

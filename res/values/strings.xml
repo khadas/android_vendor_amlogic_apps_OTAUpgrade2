@@ -100,5 +100,6 @@
     <string name="backup_result">backup finish</string>
     <string name="restore_result">restore finish</string>
     <string name="remove_hit">backup will save to external storage if exists or backup save fail</string>
+    <string name="noti_msg">Download success</string>
     <string name="prepare_waitting">"prepare,make sure BACKUP file in your external storage"</string>
 </resources>
