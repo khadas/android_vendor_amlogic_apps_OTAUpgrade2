@@ -180,7 +180,6 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
 
         public ArrayList<File> getExternalStorageList(){
             Class<?> volumeInfoC = null;
-            Method getcomparator = null;
             Method getvolume = null;
             Method isMount = null;
             Method getType = null;
@@ -190,7 +189,6 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
             ArrayList<File> devList = new ArrayList<File>();
             try {
                 volumeInfoC = Class.forName("android.os.storage.VolumeInfo");
-                getcomparator = volumeInfoC.getMethod("getDescriptionComparator");
                 getvolume = StorageManager.class.getMethod("getVolumes");
                 isMount = volumeInfoC.getMethod("isMountedReadable");
                 getType = volumeInfoC.getMethod("getType");
@@ -214,35 +212,36 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
             StorageManager mStorageManager = (StorageManager)mContext.getSystemService(Context.STORAGE_SERVICE);
             Class<?> volumeInfoC = null;
             Class<?> deskInfoC = null;
-            Method getcomparator = null;
             Method getvolume = null;
             Method getDisk = null;
             Method isMount = null;
             Method getPath = null;
+            Method getType = null;
             List<?> mVolumes = null;
             try {
                 volumeInfoC = Class.forName("android.os.storage.VolumeInfo");
                 deskInfoC = Class.forName("android.os.storage.DiskInfo");
-                getcomparator = volumeInfoC.getMethod("getDescriptionComparator");
                 getvolume = StorageManager.class.getMethod("getVolumes");
                 mVolumes = (List<?>)getvolume.invoke(mStorageManager);//mStorageManager.getVolumes();
                 isMount = volumeInfoC.getMethod("isMountedReadable");
                 getDisk = volumeInfoC.getMethod("getDisk");
                 getPath = volumeInfoC.getMethod("getPath");
+                getType = volumeInfoC.getMethod("getType");
                 for (Object vol : mVolumes) {
-                    if (vol != null && (boolean)isMount.invoke(vol)) {
+                    if (vol != null && (boolean)isMount.invoke(vol) && ((int)getType.invoke(vol) == 0)) {
                         Object info = getDisk.invoke(vol);
+                        Log.d(TAG, "getDiskInfo" +((File)getPath.invoke(vol)).getAbsolutePath());
                         if ( info != null && filePath.contains(((File)getPath.invoke(vol)).getAbsolutePath()) ) {
+                            Log.d(TAG, "getDiskInfo path.getName():" +((File)getPath.invoke(vol)).getAbsolutePath());
                             return info;
                         }
-                        Log.d(TAG, "path.getName():" +((File)getPath.invoke(vol)).getAbsolutePath());
                     }
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
-            } finally {
-                return null;
             }
+            return null;
+
         }
 
         public String getTransPath(String inPath) {
@@ -267,7 +266,7 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
                 getType = volumeInfoC.getMethod("getType");
                 getPath = volumeInfoC.getMethod("getPath");
                 for (Object vol : volumes) {
-                    if (vol != null && (boolean)isMount.invoke(vol) && (int)getType.invoke(vol,"") == 0) {
+                    if (vol != null && (boolean)isMount.invoke(vol) && (int)getType.invoke(vol) == 0) {
                         pathVol = ((File)getPath.invoke(vol)).getAbsolutePath();
                         idx = inPath.indexOf(pathVol);
                         if (idx != -1) {
@@ -300,6 +299,7 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
         }
 
         public int createAmlScript(String fullpath, boolean wipe_data, boolean wipe_cache) {
+
             File file;
             String res = "";
             int UpdateMode = OtaUpgradeUtils.UPDATE_UPDATE;
@@ -307,7 +307,9 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
 
             try {
                 File parent = file.getParentFile();
-
+                if (file.exists()) {
+                    file.delete();
+                }
                 if (!parent.exists()) {
                     parent.mkdirs();
                 }
@@ -318,34 +320,39 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             res += "--update_package=";
             Class<?> deskInfoClass = null;
             Method isSd = null;
             Method isUsb = null;
             Object info = getDiskInfo(fullpath);
-            try {
-                deskInfoClass = Class.forName("android.os.storage.DeskInfo");
-                isSd = deskInfoClass.getMethod("isSd()");
-                if ( info != null ) {
-                    if ( (boolean)isSd.invoke(info) ) {
-                        res += "/sdcard/";
-                    }else if ( (boolean)isUsb.invoke(info) ) {
-                        res += "/udisk/";
-                    }else {
+            if (info == null) {
+                res += "/cache/";
+                UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
+            } else {
+                try {
+                    deskInfoClass = Class.forName("android.os.storage.DiskInfo");
+                    isSd = deskInfoClass.getMethod("isSd");
+                    isUsb = deskInfoClass.getMethod("isUsb");
+                    if ( info != null ) {
+                        if ( (boolean)isSd.invoke(info) ) {
+                            res += "/sdcard/";
+                        }else if ( (boolean)isUsb.invoke(info) ) {
+                            res += "/udisk/";
+                        }else {
+                            res += "/cache/";
+                            UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
+                        }
+                    } else {
                         res += "/cache/";
                         UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
                     }
-                } else {
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                     res += "/cache/";
                     UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
                 }
-
-            } catch (Exception ex) {
-                res += "/cache/";
-                UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
             }
-
             res += new File(fullpath).getName();
             res += ("\n--locale=" + Locale.getDefault().toString());
             res += (wipe_data? "\n--wipe_data" : "");
