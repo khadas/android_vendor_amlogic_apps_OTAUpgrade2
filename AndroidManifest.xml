@@ -70,7 +70,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <intent-filter android:priority="2">
+            <intent-filter>
                 <action android:name="android.settings.SYSTEM_UPDATE_SETTINGS" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
