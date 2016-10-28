@@ -89,15 +89,15 @@ public class LoaderReceiver extends BroadcastReceiver {
                         ( netInfo != null ) &&
                         ( netInfo.getDetailedState() == NetworkInfo.DetailedState.CONNECTED ) ) {
                     mPref.setBoolean ( "Boot_Checked", false );
+                    Intent mIntent =new Intent(UpdateService.ACTION_AUTOCHECK);
+                    mIntent.setPackage(context.getPackageName());
                     if ( mPref.getBooleanVal ( PrefUtils.PREF_AUTO_CHECK, false ) ) {
-                        mContext.startService ( new Intent (
-                                                    UpdateService.ACTION_AUTOCHECK ) );
+                        mContext.startService(mIntent);
                         return;
                     } else if ( ( "true" ).equals ( PrefUtils.getProperties (
                                                         "ro.product.update.autocheck", "false" ) ) ) {
                         mPref.setBoolean ( PrefUtils.PREF_AUTO_CHECK, true );
-                        mContext.startService ( new Intent (
-                                                    UpdateService.ACTION_AUTOCHECK ) );
+                        mContext.startService(mIntent);
                     }
                 }
             }
