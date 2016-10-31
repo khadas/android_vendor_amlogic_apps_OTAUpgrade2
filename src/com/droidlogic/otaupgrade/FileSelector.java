@@ -95,7 +95,7 @@ public class FileSelector extends Activity implements OnItemClickListener {
             mHandler.sendMessageDelayed ( nmsg, WAITDIALOG_DISPALY_TIME );
             new Thread() {
                 public void run() {
-                    ArrayList<File> files = mPrefUtil.getExternalStorageList();
+                    ArrayList<File> files = mPrefUtil.getMainStorageList();
                     mAdapter.getList ( files );
                     mHandler.sendEmptyMessage ( MSG_HIDE_SHOW_DIALOG );
                 }

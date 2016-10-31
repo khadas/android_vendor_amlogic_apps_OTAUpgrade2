@@ -207,7 +207,35 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
                 return devList;
             }
         }
+        public ArrayList<File> getMainStorageList(){
+            Class<?> volumeInfoC = null;
+            Method getvolume = null;
+            Method isMount = null;
+            Method getType = null;
+            Method getPath = null;
+            List<?> mVolumes = null;
+            StorageManager mStorageManager = (StorageManager)mContext.getSystemService(Context.STORAGE_SERVICE);
+            ArrayList<File> devList = new ArrayList<File>();
+            try {
+                volumeInfoC = Class.forName("android.os.storage.VolumeInfo");
+                getvolume = StorageManager.class.getMethod("getVolumes");
+                isMount = volumeInfoC.getMethod("isMountedReadable");
+                getType = volumeInfoC.getMethod("getType");
+                getPath = volumeInfoC.getMethod("getPathForUser",int.class);
+                mVolumes = (List<?>)getvolume.invoke(mStorageManager);
 
+                for (Object vol : mVolumes) {
+                    if (vol != null && (boolean)isMount.invoke(vol) && ((int)getType.invoke(vol) == 0 || (int)getType.invoke(vol) == 2) ) {
+                        devList.add((File)getPath.invoke(vol,0));
+                        Log.d(TAG, "path.getName():" + getPath.invoke(vol,0));
+                    }
+                }
+            }catch (Exception ex) {
+                ex.printStackTrace();
+            }finally {
+                return devList;
+            }
+        }
         public Object getDiskInfo(String filePath){
             StorageManager mStorageManager = (StorageManager)mContext.getSystemService(Context.STORAGE_SERVICE);
             Class<?> volumeInfoC = null;
@@ -417,6 +445,7 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
 
 
             File dev = new File ( backupOutFile );
+            if ( !new File(backupInrFile).exists() ) { return; }
             if ( backupOutFile.isEmpty() || dev == null || !dev.canWrite() ) {
                 return;
             }
