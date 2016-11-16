@@ -6,7 +6,8 @@
     <string name="update_online">Online update</string>
     <string name="update_local">Local update</string>
     <string name="restart_system">Restart System</string>
-    <string name="capacty_not_enough">External Storage Capacity Cannot Support This Update</string>
+    <string name="capacty_not_enough">External Storage Capacity Not Enough,Please Release Memory</string>
+    <string name="data_not_enough">Device Memory Not Enough,Please Release Memory</string>
     <string name="backup_title">Backup Your Data</string>
     <string name="backup_info">System Will be Reset,Will Backup Your Data</string>
     <string name="backup_ok">YES,Backup</string>

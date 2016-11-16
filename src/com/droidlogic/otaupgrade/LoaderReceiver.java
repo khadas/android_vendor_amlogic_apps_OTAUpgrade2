@@ -62,9 +62,11 @@ public class LoaderReceiver extends BroadcastReceiver {
             mContext = context;
             mPref = new PrefUtils ( mContext );
             getBackUpFileName();
-            Log.d ( TAG, "action:" + intent.getAction() );
             if ( intent.getAction().equals ( Intent.ACTION_BOOT_COMPLETED ) ||
                     intent.getAction().equals ( RESTOREDATA ) ) {
+                if (intent.getAction().equals ( Intent.ACTION_BOOT_COMPLETED )) {
+                    mPref.clearData();
+                }
                 mPref.setBoolean ( "Boot_Checked", true );
                 afterReboot();
             } else if ( intent.getAction().equals ( BACKUPDATA ) ) {

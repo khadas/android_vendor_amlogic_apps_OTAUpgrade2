@@ -86,7 +86,8 @@
     <string name="net_status_change">"当前网络环境发生改变"</string>
     <string name="stop_download_first">"请先停止下载！"</string>
     <string name="net_error">"查找更新失败,请检查网络连接是否正确"</string>
-    <string name="capacty_not_enough">"存储空间不够,可能导致下载失败"</string>
+    <string name="capacty_not_enough">"外部设备存储空间不够,请释放外设空间"</string>
+    <string name="data_not_enough">"设备内存不够,请释放内存空间"</string>
     <string name="download_error">"下载失败"</string>
     <string name="check_title">"系统更新"</string>
     <string name="check_summary">"检测到新版本，点击进入更新"</string>

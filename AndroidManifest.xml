@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.droidlogic.otaupgrade"
     android:versionCode="2"
+    android:sharedUserId="android.uid.system"
     android:versionName="2.0201411271418" >
 
     <uses-permission android:name="android.permission.BACKUP" />

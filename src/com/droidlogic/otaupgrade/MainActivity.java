@@ -145,8 +145,7 @@ public class MainActivity extends Activity implements OnClickListener {
         if (item.getItemId() == R.id.about) {
             AlertDialog.Builder builder = new Builder(MainActivity.this);
 
-            if (getResources().getConfiguration().locale.getCountry()
-                                                            .equals("CN")) {
+            if (getResources().getConfiguration().locale.getCountry().equals("CN")) {
                 builder.setMessage(getFromAssets(VERSION_NAME + "_cn"));
             } else {
                 builder.setMessage(getFromAssets(VERSION_NAME));

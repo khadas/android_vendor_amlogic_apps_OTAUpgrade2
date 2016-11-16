@@ -96,7 +96,7 @@ public class UpdateActivity extends Activity {
     private QueryThread[] mQueryThread = new QueryThread[2];
     private PrefUtils mPreference;
     private Handler mHandler = new Handler();
-    private int mDownSize = 0;
+    private long mDownSize = 0;
     private Button mCheckBtn;
     private BroadcastReceiver sdcardListener = new BroadcastReceiver() {
             @Override
@@ -129,7 +129,7 @@ public class UpdateActivity extends Activity {
                 Intent extrasIntent = getIntent();
                 String action = extrasIntent.getAction();
                 boolean b = mServiceBinder.getTaskRunnningStatus(UpdateService.TASK_ID_DOWNLOAD) == UpdateTasks.RUNNING_STATUS_UNSTART;
-                int lastDownSize = mServiceBinder.getTaskProgress(UpdateService.TASK_ID_DOWNLOAD);
+                long lastDownSize = mServiceBinder.getTaskProgress(UpdateService.TASK_ID_DOWNLOAD);
 
                 if ((lastDownSize == 0) && b) {
                     mServiceBinder.startTask(UpdateService.TASK_ID_CHECKING);
@@ -179,7 +179,7 @@ public class UpdateActivity extends Activity {
                                 mServiceBinder.setTaskPause(UpdateService.TASK_ID_DOWNLOAD);
                             }
                         }
-                    }else if ((activeInfo != null) && activeInfo.isConnected()) {
+                    }else if ((activeInfo != null) && activeInfo.isConnected()&&Integer.valueOf(R.string.download_resume).equals(mCombineBtn.getTag())) {
                         mCombineBtn.setText(R.string.download_pause);
                         mCombineBtn.setTag(Integer
                                         .valueOf(R.string.download_pause));
@@ -291,21 +291,22 @@ public class UpdateActivity extends Activity {
     private boolean handleSDcardSituation() {
         boolean isScriptAsk = mPreference.getScriptAsk();
 
-        if (isScriptAsk) {
-            String filePath = mPreference.getUpdatePath();
-            File saveFilePath = new File(filePath).getParentFile();
+        String filePath = mPreference.getUpdatePath();
+        File saveFilePath = null;
+        long freeSpace = 0L;
+        mDownSize = mPreference.getFileSize();
+        if ( filePath == null ) {return false;}
+        if ( isScriptAsk ) {
+            saveFilePath = new File(filePath).getParentFile();
 
             if (saveFilePath.canWrite()) {
-                StatFs statFs = new StatFs(saveFilePath.getAbsolutePath());
-                int blockSize = statFs.getBlockSize();
-                int avaliableBlocks = statFs.getAvailableBlocks();
-                int totalBlocks = statFs.getBlockCount();
-                mDownSize = (int) mPreference.getFileSize();
+                freeSpace = saveFilePath.getFreeSpace();
 
                 if ((mDownSize > 0) &&
-                        ((mDownSize / blockSize) > avaliableBlocks)) {
+                        (mDownSize > freeSpace)) {
                     Toast.makeText(UpdateActivity.this,
                         R.string.capacty_not_enough, Toast.LENGTH_LONG).show();
+                    return false;
                 } else {
                     if (sdcardFlag && isScriptAsk) {
                         IntentFilter intentFilter = new IntentFilter();
@@ -325,6 +326,16 @@ public class UpdateActivity extends Activity {
                 Activity activity = (Activity) this;
                 startActivityForResult(intent0, 1);
 
+                return false;
+            }
+        } else {
+            //data test now
+            saveFilePath = new File(filePath).getParentFile();
+            freeSpace = saveFilePath.getFreeSpace();
+            if ((mDownSize > 0) &&
+                    (mDownSize > freeSpace)) {
+                Toast.makeText(UpdateActivity.this,
+                    R.string.data_not_enough, Toast.LENGTH_LONG).show();
                 return false;
             }
         }
@@ -409,6 +420,7 @@ public class UpdateActivity extends Activity {
                         InstallPackage dlgView = (InstallPackage) inflater.inflate(R.layout.install_ota,
                                 null, false);
                         dlgView.setPackagePath(mPreference.getUpdatePath());
+                        dlgView.setDelParam(true);
                         dlgView.setParamter(UpdateMode);
                         dlg.setCancelable(false);
                         dlg.setContentView(dlgView);
@@ -423,7 +435,7 @@ public class UpdateActivity extends Activity {
                 }
             });
 
-        mDownSize = (int) mPreference.getFileSize();
+        mDownSize = mPreference.getFileSize();
 
         mCancel.setOnClickListener(new OnClickListener() {
                 @Override
@@ -495,7 +507,7 @@ public class UpdateActivity extends Activity {
 
                                 if (mDownSize > 0 && lastProgress > 10*1024) {
                                     mProgress.setVisibility(View.VISIBLE);
-                                    mProgress.setMax((int) mDownSize);
+                                    mProgress.setMax((int)(mDownSize/1024));
                                     mPercent.setVisibility(View.VISIBLE);
 
                                     if (lastProgress < mDownSize) {
@@ -513,7 +525,7 @@ public class UpdateActivity extends Activity {
                                                 R.string.scan_tip));
                                 }
 
-                                mProgress.setProgress((int) lastProgress);
+                                mProgress.setProgress((int)(lastProgress/1024));
                             }
                         });
                 }

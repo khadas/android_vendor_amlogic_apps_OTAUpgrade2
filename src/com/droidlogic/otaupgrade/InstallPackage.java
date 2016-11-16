@@ -42,7 +42,7 @@ public class InstallPackage extends LinearLayout implements OtaUpgradeUtils.Prog
     private Button mDismiss;
     private int mUpdateMode;
     private PrefUtils mPref = null;
-
+    private boolean isDelUpdate = false;
     public InstallPackage(Context context, AttributeSet attrs) {
         super(context, attrs);
         mInflater = LayoutInflater.from(context);
@@ -94,6 +94,7 @@ public class InstallPackage extends LinearLayout implements OtaUpgradeUtils.Prog
                             @Override
                             public void run() {
                                 mPref.copyBKFile();
+                                mUpdateUtils.setDeleteSource(isDelUpdate);
                                 mUpdateUtils.upgrade(new File(mPackagePath),
                                     InstallPackage.this, mUpdateMode);
                             }
@@ -104,6 +105,10 @@ public class InstallPackage extends LinearLayout implements OtaUpgradeUtils.Prog
 
     public void setParamter(int updateMode) {
         mUpdateMode = updateMode;
+    }
+
+    public void setDelParam(boolean wipe) {
+        isDelUpdate = wipe;
     }
 
     @Override

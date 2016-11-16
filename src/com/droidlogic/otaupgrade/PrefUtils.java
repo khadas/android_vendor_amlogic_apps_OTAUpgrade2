@@ -61,6 +61,7 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
         public static final String PREF_START_RESTORE = "retore_start";
         public static final String PREF_AUTO_CHECK = "auto_check";
         static final String FlagFile = ".wipe_record";
+        public static final String DATA_UPDATE = "/data/droidota/update.zip";
         private Context mContext;
         private SharedPreferences mPrefs;
 
@@ -89,6 +90,21 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
 
         public void setDescrib ( String desc ) {
             setString ( PREFS_UPDATE_DESC, desc );
+        }
+
+        public void clearData() {
+            String filePath = getUpdatePath();
+            File file = null;
+            if ( filePath != null ) {
+                file = new File(filePath);
+                if (file.exists()) {
+                    file.delete();
+                }
+            }
+            file = new File(DATA_UPDATE);
+            if (file.exists()) {
+                file.delete();
+            }
         }
 
         public String getDescri() {
@@ -135,7 +151,9 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
 
         public String getUpdatePath() {
             String path = mPrefs.getString ( PREFS_UPDATE_FILEPATH, null );
-            path = onExternalPathSwitch(path);
+            if (path != null) {
+                path = onExternalPathSwitch(path);
+            }
             return path;
         }
 

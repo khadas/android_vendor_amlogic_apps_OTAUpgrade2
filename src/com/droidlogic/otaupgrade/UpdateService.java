@@ -236,8 +236,8 @@ public class UpdateService extends Service {
             return errorCode;
         }
 
-        public int getTaskProgress(int taskId) {
-            int progress = -1;
+        public long getTaskProgress(int taskId) {
+            long progress = -1;
 
             switch (taskId) {
             case TASK_ID_CHECKING:
