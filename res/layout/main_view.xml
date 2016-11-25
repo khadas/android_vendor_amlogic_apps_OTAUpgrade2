@@ -6,6 +6,7 @@
     <TextView
         android:id="@+id/updateview"
         style="?android:attr/textAppearanceLarge"
+        android:textSize="@dimen/text_titile_size"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -146,6 +147,7 @@
     <TextView
         android:id="@+id/backuptitle"
         style="?android:attr/textAppearanceLarge"
+        android:textSize="@dimen/text_titile_size"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/update_locale_layer"

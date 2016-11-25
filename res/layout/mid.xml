@@ -2,6 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/trans"
+    android:paddingLeft="@dimen/padding_dialog"
+    android:paddingRight="@dimen/padding_dialog"
     android:gravity="center_vertical|center_horizontal"
     android:orientation="vertical" >
 
@@ -39,14 +42,14 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dip"
 		android:layout_marginRight="30dip"
-		android:textSize="22sp"
-        android:layout_marginTop="10dip"
+		android:textSize="@dimen/text_size"
+        android:layout_marginTop="6dip"
         android:text="@string/warnning"/>
 
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-		android:paddingTop="40dp"
+		android:paddingTop="20dp"
         android:gravity="bottom|center_horizontal">
 
         <Button
@@ -54,26 +57,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:paddingBottom="10dip"
-            android:paddingLeft="30dp"
-			android:textSize="24sp"
-            android:paddingRight="30dp"
-            android:paddingTop="10dip"
-            android:layout_marginLeft="30dp"
+            android:layout_marginLeft="10dp"
             android:text="@string/cancel" />
 
         <Button
             android:id="@+id/sdcard_ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dip"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp"
-			android:textSize="24sp"
-            android:paddingTop="10dip"
             android:layout_alignBaseline="@id/sdcard_cancel"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="30dp"
+            android:layout_marginRight="10dp"
             android:text="@string/sure" />
     </RelativeLayout>
 

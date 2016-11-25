@@ -59,7 +59,7 @@
         <activity
             android:name="com.droidlogic.otaupgrade.BadMovedSDcard"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.Holo.Dialog" >
+            android:theme="@style/dialog" >
         </activity>
         <activity
             android:name="com.droidlogic.otaupgrade.MainActivity"
