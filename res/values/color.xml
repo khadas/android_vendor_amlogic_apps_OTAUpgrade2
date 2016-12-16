@@ -9,7 +9,7 @@
     <color name="lightyellow" >#FFFFE0</color>
 
     <color name="yellow" >#FFFF00</color>
-
+    <color name="black">#00000000</color>
     <color name="snow" >#FFFAFA</color>
 
 </resources>

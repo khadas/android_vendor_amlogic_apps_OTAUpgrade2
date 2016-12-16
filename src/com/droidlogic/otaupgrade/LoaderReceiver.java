@@ -64,6 +64,9 @@ public class LoaderReceiver extends BroadcastReceiver {
             getBackUpFileName();
             if ( intent.getAction().equals ( Intent.ACTION_BOOT_COMPLETED ) ||
                     intent.getAction().equals ( RESTOREDATA ) ) {
+                Intent abcheck = new Intent(mContext, ABCheckUpService.class);
+                abcheck.putExtra(ABCheckUpService.REASON,ABCheckUpService.REASON_COMPLETE);
+                mContext.startService (abcheck);
                 if (intent.getAction().equals ( Intent.ACTION_BOOT_COMPLETED )) {
                     mPref.clearData();
                 }
@@ -101,6 +104,9 @@ public class LoaderReceiver extends BroadcastReceiver {
                         mContext.startService ( new Intent (
                                                     UpdateService.ACTION_AUTOCHECK ) );
                     }
+                    Intent abupdate = new Intent(mContext, ABCheckUpService.class);
+                    abupdate.putExtra(ABCheckUpService.REASON,ABCheckUpService.REASON_UPDATE);
+                    mContext.startService (abupdate);
                 }
             }
         }

@@ -23,4 +23,5 @@
     <dimen name="padding_dialog">18dp</dimen>
     <dimen name="dialog_size">520dp</dimen>
     <dimen name="dialog_height">200dp</dimen>
+
 </resources>
