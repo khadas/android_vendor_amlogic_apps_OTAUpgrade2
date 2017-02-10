@@ -4,9 +4,11 @@ include $(CLEAR_VARS)
 LOCAL_MODULE_TAGS := optional
 LOCAL_STATIC_JAVA_LIBRARIES := libota
 LOCAL_SDK_VERSION := current
-LOCAL_SRC_FILES := $(call all-java-files-under, src)\
-                   $(TOP)/src/android/os/IUpdateEngineCallback.aidl
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
+ifneq ($(PLATFORM_SDK_VERSION),23)
+    LOCAL_SRC_FILES += $(TOP)/src/android/os/IUpdateEngineCallback.aidl
+endif
 LOCAL_PACKAGE_NAME := OTAUpgrade
 LOCAL_CERTIFICATE := platform
 LOCAL_DEX_PREOPT := false
