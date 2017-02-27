@@ -70,7 +70,7 @@ public class LoaderReceiver extends BroadcastReceiver {
                     abcheck.putExtra("reason","complete");
                     mContext.startService (abcheck);
                 } catch(ClassNotFoundException ex) {
-                    ex.printStackTrace();
+                    //ex.printStackTrace();
                 }
                 if (intent.getAction().equals ( Intent.ACTION_BOOT_COMPLETED )) {
                     mPref.clearData();
@@ -115,7 +115,7 @@ public class LoaderReceiver extends BroadcastReceiver {
                         abupdate.putExtra("reason","complete");
                         mContext.startService (abupdate);
                     } catch(ClassNotFoundException ex) {
-                        ex.printStackTrace();
+                        //ex.printStackTrace();
                     }
                 }
             }
