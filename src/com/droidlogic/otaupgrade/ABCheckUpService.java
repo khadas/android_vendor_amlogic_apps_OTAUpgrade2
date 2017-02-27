@@ -160,7 +160,7 @@ public class ABCheckUpService extends Service {
         } else {
             mRCHandler.post(update);
         }
-        return super.onStartCommand(intent, flags, startId);
+        return START_NOT_STICKY;
     }
 
 }
