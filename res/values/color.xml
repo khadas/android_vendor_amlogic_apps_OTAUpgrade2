@@ -3,13 +3,14 @@
 
     <color name="white" >#FFFFFF</color>
 
-    <!--<color name="blanchedalmond" >#FFFFF0</color>-->
-    <color name="blanchedalmond" >#EF000000</color>
+    <color name="blanchedalmond" >#FFFFF0</color>
+   <!-- <color name="blanchedalmond" >#EF000000</color>-->
     <color name="trans" >#DD000000</color>
     <color name="lightyellow" >#FFFFE0</color>
 
     <color name="yellow" >#FFFF00</color>
     <color name="black">#00000000</color>
     <color name="snow" >#FFFAFA</color>
-
+    <color name="blue">#6F17509B</color>
+    <color name="blue_light">#A017509B</color>
 </resources>

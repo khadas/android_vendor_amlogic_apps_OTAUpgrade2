@@ -21,7 +21,7 @@
         android:layout_below="@+id/updateview"
         android:layout_marginLeft="6dp"
         android:layout_marginRight="6dp"
-        android:background="#FFFFFF" />
+        android:background="@color/blue_light" />
 
     <TextView
         android:id="@+id/updateonline"
@@ -38,7 +38,7 @@
         android:layout_below="@+id/updateonline"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:background="#F0ECECEC" />
+        android:background="@color/blue" />
 
     <Button
         android:id="@+id/updatebtn"
@@ -68,7 +68,7 @@
         android:layout_below="@+id/updatelocale"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:background="#F0ECECEC" />
+        android:background="@color/blue_light" />
 
         <LinearLayout
             android:id="@+id/showdetail"
@@ -79,7 +79,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
-            android:divider="#F0ECECEC"
+            android:divider="@color/blue"
             android:orientation="vertical" >
 
             <CheckBox
@@ -161,7 +161,7 @@
         android:layout_below="@id/backuptitle"
         android:layout_marginLeft="6dp"
         android:layout_marginRight="6dp"
-        android:background="#FFFFFF" />
+        android:background="@color/blue_light" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -205,7 +205,7 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:background="#F0ECECEC" />
+            android:background="#00FF00" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -238,7 +238,7 @@
             android:layout_marginBottom="20dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:background="#F0ECECEC" />
+            android:background="@color/blue_light" />
 </LinearLayout>
 
 </RelativeLayout>
