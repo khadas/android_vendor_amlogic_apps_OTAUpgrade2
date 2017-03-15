@@ -60,7 +60,7 @@
     <string name="check_now">Checking, Please Wait...</string>
     <string name="check_failed">Undiscover New Version</string>
     <string name="check_succeed">Discover a New Version!</string>
-    <string name="check_unknown">Check Failed!Check Your OTA Servier Argent</string>
+    <string name="check_unknown">Check Failed!Check Your OTA Service Argent</string>
     <string name="Download_succeed">Package Download Finish, Please Click to Update.</string>
     <string name="Download_failed">Package Download Finish, But It Can Not Pass The Verify, Please Check Your Network.</string>
     <string name="select">Select</string>
