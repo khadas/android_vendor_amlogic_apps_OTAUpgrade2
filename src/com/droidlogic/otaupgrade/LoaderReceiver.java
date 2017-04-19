@@ -112,7 +112,7 @@ public class LoaderReceiver extends BroadcastReceiver {
                     try{
                         Class abcheckService = Class.forName("com.droidlogic.otaupgrade.ABCheckUpService");
                         Intent abupdate = new Intent(mContext, abcheckService);
-                        abupdate.putExtra("reason","complete");
+                        abupdate.putExtra("reason","update");
                         mContext.startService (abupdate);
                     } catch(ClassNotFoundException ex) {
                         //ex.printStackTrace();
