@@ -5,6 +5,10 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_STATIC_JAVA_LIBRARIES := libota
 LOCAL_SDK_VERSION := current
 
+ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 26 && echo OK),OK)
+LOCAL_PROPRIETARY_MODULE := true
+endif
+
 ifeq ($(PLATFORM_SDK_VERSION),23)
     LOCAL_SRC_FILES := $(TOP)/src/com/droidlogic/otaupgrade/BackupActivity.java \
                        $(TOP)/src/com/droidlogic/otaupgrade/BadMovedSDcard.java \
