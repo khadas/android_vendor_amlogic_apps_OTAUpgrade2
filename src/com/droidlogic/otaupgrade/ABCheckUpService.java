@@ -28,6 +28,7 @@ import java.net.URLConnection;
 import com.amlogic.update.util.UpgradeInfo;
 import com.amlogic.update.util.PrefUtil;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -37,7 +38,10 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.util.Log;
-
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
 public class ABCheckUpService extends Service {
     private static String TAG = "ABCheckUpService";
     private HandlerThread mRCThread;
@@ -48,14 +52,20 @@ public class ABCheckUpService extends Service {
     public static final String REASON_UPDATE = "update";
     public static final String REASON_COMPLETE = "complete";
     private boolean download = false;
-
+    private PrefUtils mPref;
+    private BroadcastReceiver mReceiver;
     @Override
     public void onCreate() {
         super.onCreate();
         mRCThread = new HandlerThread("update");
         mRCThread.start();
         mRCHandler = new Handler(mRCThread.getLooper());
-
+        mPref = new PrefUtils ( this );
+        mReceiver = new ConnectReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        this.registerReceiver(mReceiver, filter);
+        UpgradeInfo update = new UpgradeInfo(this);
     }
 
     @Override
@@ -154,28 +164,36 @@ public class ABCheckUpService extends Service {
     @Override
     public void onDestroy() {
         Log.d(TAG,"onDestroy..............");
+        unregisterReceiver(mReceiver);
         if ( mRCThread != null ) {
             mRCThread.quitSafely();
             mRCThread = null;
         }
     }
 
-
+    class ConnectReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive ( Context context, Intent intent ) {
+            if ( ( ConnectivityManager.CONNECTIVITY_ACTION ).equals ( intent.getAction() ) ) {
+                Bundle bundle = intent.getExtras();
+                NetworkInfo netInfo = ( NetworkInfo )bundle.getParcelable( WifiManager.EXTRA_NETWORK_INFO);
+                if ( mPref.getBooleanVal ( "Boot_Checked", false ) &&
+                        ( netInfo != null ) &&
+                        ( netInfo.getDetailedState() == NetworkInfo.DetailedState.CONNECTED ) ) {
+                    mPref.setBoolean ( "Boot_Checked", false );
+                    mRCHandler.post(update);
+                }
+            }
+        }
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        UpgradeInfo info =new UpgradeInfo(ABCheckUpService.this);
-        String reason = intent.getStringExtra(REASON);
-        Log.d(TAG,"onStartCommand.............."+reason);
-        if ( reason != null && reason.equals(REASON_COMPLETE) ) {
-            String ab_update = UpgradeInfo.getString(AB_UPDATE);
-            if ( ab_update.equalsIgnoreCase("true") ) {
-               disableOTA(true);
-            } else {
-               disableOTA(false);
-            }
+        String ab_update = UpgradeInfo.getString(AB_UPDATE);
+        if ( ab_update.equalsIgnoreCase("true") ) {
+           disableOTA(true);
         } else {
-            mRCHandler.post(update);
+           disableOTA(false);
         }
         return START_NOT_STICKY;
     }

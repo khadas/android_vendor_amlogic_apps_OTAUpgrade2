@@ -61,10 +61,12 @@ public class UpdateEngineCallback extends IUpdateEngineCallback.Stub{
             public void dispatchMessage(Message msg) {
                 switch ( msg.what ) {
                     case MSG_SHOWPROGRESS:
-                    showProgress();
+                    if (!isShowing)
+                        showProgress();
                     break;
                     case MSG_HIDEPROGRESS:
-                    hideProgress();
+                    if (isShowing)
+                        hideProgress();
                     break;
                     case MSG_UPDATEPROCESS:
                     mBar.setProgress(msg.arg1);
@@ -143,7 +145,8 @@ public class UpdateEngineCallback extends IUpdateEngineCallback.Stub{
     private void hideProgress() {
         isShowing = false;
         Log.d(TAG,"hideprogress");
-        mWindowManager.removeView(rootView);
+        if ( rootView != null && rootView.isShown())
+            mWindowManager.removeView(rootView);
     }
 
 }

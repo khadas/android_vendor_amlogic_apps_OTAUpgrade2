@@ -77,7 +77,6 @@ public class LoaderReceiver extends BroadcastReceiver {
                 try{
                     Class abcheckService = Class.forName("com.droidlogic.otaupgrade.ABCheckUpService");
                     Intent abcheck = new Intent(mContext, abcheckService);
-                    abcheck.putExtra("reason","complete");
                     mContext.startService (abcheck);
                 } catch(ClassNotFoundException ex) {
                     //ex.printStackTrace();
@@ -108,24 +107,12 @@ public class LoaderReceiver extends BroadcastReceiver {
                 if ( mPref.getBooleanVal ( "Boot_Checked", false ) &&
                         ( netInfo != null ) &&
                         ( netInfo.getDetailedState() == NetworkInfo.DetailedState.CONNECTED ) ) {
-                    mPref.setBoolean ( "Boot_Checked", false );
-                    if ( mPref.getBooleanVal ( PrefUtils.PREF_AUTO_CHECK, false ) ) {
-                        mContext.startService ( new Intent (
-                                                    UpdateService.ACTION_AUTOCHECK ) );
-                        return;
-                    } else if ( ( "true" ).equals ( PrefUtils.getProperties (
+                    if ( mPref.getBooleanVal ( PrefUtils.PREF_AUTO_CHECK, false ) ||( "true" ).equals ( PrefUtils.getProperties (
                                                         "ro.product.update.autocheck", "false" ) ) ) {
                         mPref.setBoolean ( PrefUtils.PREF_AUTO_CHECK, true );
+                        mPref.setBoolean ( "Boot_Checked", false );
                         mContext.startService ( new Intent (
                                                     UpdateService.ACTION_AUTOCHECK ) );
-                    }
-                    try{
-                        Class abcheckService = Class.forName("com.droidlogic.otaupgrade.ABCheckUpService");
-                        Intent abupdate = new Intent(mContext, abcheckService);
-                        abupdate.putExtra("reason","update");
-                        mContext.startService (abupdate);
-                    } catch(ClassNotFoundException ex) {
-                        //ex.printStackTrace();
                     }
                 }
             }
