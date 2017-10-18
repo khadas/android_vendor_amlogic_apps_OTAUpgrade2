@@ -18,7 +18,7 @@ package com.droidlogic.otaupgrade;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import java.io.BufferedWriter;
@@ -31,6 +31,7 @@ import com.amlogic.update.DownloadUpdateTask;
 
 import android.os.storage.StorageManager;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +47,8 @@ import java.nio.channels.FileChannel;
 import com.amlogic.update.OtaUpgradeUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
+import java.lang.reflect.Constructor;
+
 /**
  * @ClassName PrefUtils
  * @Description TODO
@@ -202,7 +205,7 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
             return ( "true" ).equals ( auto );
         }
 
-        public ArrayList<File> getExternalStorageList(){
+        private ArrayList<File> getExternalStorageListOnN(){
             Class<?> volumeInfoC = null;
             Method getvolume = null;
             Method isMount = null;
@@ -231,7 +234,40 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
                 return devList;
             }
         }
-        public ArrayList<File> getMainStorageList(){
+        public ArrayList<File> getStorageList(boolean extern) {
+
+            if ( Build.VERSION.SDK_INT >= 26 ) {
+                Class<?>  fileListClass = null;
+                Method getdev = null;
+                ArrayList<File> devList = new ArrayList<File>();
+                try {
+                    fileListClass = Class.forName("com.droidlogic.app.FileListManager");
+                    getdev = fileListClass.getMethod("getDevices");
+                    Constructor constructor =fileListClass.getConstructor(new Class[]{Context.class});
+                    Object fileListObj = constructor.newInstance(mContext);
+                    ArrayList<HashMap<String, Object>> devices = new ArrayList<HashMap<String,Object>>();
+                    devices = (ArrayList<HashMap<String, Object>>)getdev.invoke(fileListObj);
+
+                    for (HashMap<String, Object> dev : devices) {
+                        Log.d(TAG,"getDevice:"+dev.get("key_name")+"getType:"+dev.get("key_type"));
+                        String name = (String)dev.get("key_name");
+                        if (name.equals("Local Disk") && extern) {
+                            continue;
+                        }
+                        devList.add(new File((String)dev.get("key_path")));
+                    }
+                }catch (Exception ex) {
+                    ex.printStackTrace();
+                }finally {
+                    return devList;
+                }
+            }else if(extern) {
+                return getExternalStorageListOnN();
+            }else {
+                return getMainDeviceListonN();
+            }
+        }
+        private ArrayList<File> getMainDeviceListonN(){
             Class<?> volumeInfoC = null;
             Method getvolume = null;
             Method isMount = null;
@@ -295,8 +331,36 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
             return null;
 
         }
-
         public String getTransPath(String inPath) {
+            if ( Build.VERSION.SDK_INT >= 26 ) {
+                Class<?>  fileListClass = null;
+                Method getdev = null;
+                String outPath = inPath;
+                try {
+                    fileListClass = Class.forName("com.droidlogic.app.FileListManager");
+                    getdev = fileListClass.getMethod("getDevices");
+                    Constructor constructor =fileListClass.getConstructor(new Class[]{Context.class});
+                    Object fileListObj = constructor.newInstance(mContext);
+                    ArrayList<HashMap<String, Object>> devices = new ArrayList<HashMap<String,Object>>();
+                    devices = (ArrayList<HashMap<String, Object>>)getdev.invoke(fileListObj);
+
+                    for (HashMap<String, Object> dev : devices) {
+                        String name = (String)dev.get("key_name");
+                        String volName = (String)dev.get("key_path");
+                        if (outPath.contains(volName)) {
+                            outPath = outPath.replace(volName,name);
+                        }
+                    }
+                }catch (Exception ex) {
+                    ex.printStackTrace();
+                }finally {
+                    return outPath;
+                }
+            } else {
+                return getNickName(inPath);
+            }
+        }
+        private String getNickName(String inPath) {
             String outPath = inPath;
             String pathLast;
             String pathVol;
@@ -312,7 +376,7 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
             StorageManager storageManager = (StorageManager)mContext.getSystemService(Context.STORAGE_SERVICE);
             try {
                 volumeInfoC = Class.forName("android.os.storage.VolumeInfo");
-                getVolumes = StorageManager.class.getMethod("getVolumes",StorageManager.class);
+                getVolumes = StorageManager.class.getMethod("getVolumes");
                 volumes = (List)getVolumes.invoke(storageManager);
                 isMount = volumeInfoC.getMethod("isMountedReadable");
                 getType = volumeInfoC.getMethod("getType");
@@ -331,13 +395,14 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
                     }
                 }
             } catch (Exception ex) {
+                ex.printStackTrace();
             } finally {
                 return outPath;
             }
 
         }
         private String getCanWritePath(){
-            ArrayList<File> externalDevs =  getExternalStorageList();
+            ArrayList<File> externalDevs =  getStorageList(true);
             String filePath = "";
             for ( int j = 0; (externalDevs != null) && j < externalDevs.size(); j++ ) {
                 File dir = externalDevs.get(j);
@@ -348,6 +413,67 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
                 }
             }
             return filePath;
+        }
+        private String getAttribute(String inPath) {
+            if ( Build.VERSION.SDK_INT >= 26 ) {
+                Class<?>  fileListClass = null;
+                Method getdev = null;
+                try {
+                    fileListClass = Class.forName("com.droidlogic.app.FileListManager");
+                    getdev = fileListClass.getMethod("getDevices");
+                    Constructor constructor =fileListClass.getConstructor(new Class[]{Context.class});
+                    Object fileListObj = constructor.newInstance(mContext);
+                    ArrayList<HashMap<String, Object>> devices = new ArrayList<HashMap<String,Object>>();
+                    devices = (ArrayList<HashMap<String, Object>>)getdev.invoke(fileListObj);
+
+                    for (HashMap<String, Object> dev : devices) {
+                        String name = (String)dev.get("key_name");
+                        String volName = (String)dev.get("key_path");
+                        if (inPath.contains(volName)) {
+                            String type = (String)dev.get("key_type");
+                            if (type == "type_udisk") return "/udisk/";
+                            else if(type == "type_sdcard") return "/sdcard/";
+                        }
+                    }
+                }catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                return "/cache/";
+            } else {
+                return getAttributeonN(inPath);
+            }
+        }
+        private String getAttributeonN(String inPath) {
+            String res ="";
+            Class<?> deskInfoClass = null;
+            Method isSd = null;
+            Method isUsb = null;
+            Object info = getDiskInfo(inPath);
+            if (info == null) {
+                res += "/cache/";
+            } else {
+                try {
+                    deskInfoClass = Class.forName("android.os.storage.DiskInfo");
+                    isSd = deskInfoClass.getMethod("isSd");
+                    isUsb = deskInfoClass.getMethod("isUsb");
+                    if ( info != null ) {
+                        if ( (boolean)isSd.invoke(info) ) {
+                            res += "/sdcard/";
+                        }else if ( (boolean)isUsb.invoke(info) ) {
+                            res += "/udisk/";
+                        }else {
+                            res += "/cache/";
+                        }
+                    } else {
+                        res += "/cache/";
+                    }
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    res += "/cache/";
+                }
+            }
+            return res;
         }
 
         public int createAmlScript(String fullpath, boolean wipe_data, boolean wipe_cache) {
@@ -373,38 +499,10 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
                 e.printStackTrace();
             }
             res += "--update_package=";
-            Class<?> deskInfoClass = null;
-            Method isSd = null;
-            Method isUsb = null;
-            Object info = getDiskInfo(fullpath);
-            if (info == null) {
-                res += "/cache/";
+            String updateFilePath = getAttribute(fullpath);
+            res += updateFilePath;
+            if (updateFilePath.startsWith("/cache/"))
                 UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
-            } else {
-                try {
-                    deskInfoClass = Class.forName("android.os.storage.DiskInfo");
-                    isSd = deskInfoClass.getMethod("isSd");
-                    isUsb = deskInfoClass.getMethod("isUsb");
-                    if ( info != null ) {
-                        if ( (boolean)isSd.invoke(info) ) {
-                            res += "/sdcard/";
-                        }else if ( (boolean)isUsb.invoke(info) ) {
-                            res += "/udisk/";
-                        }else {
-                            res += "/cache/";
-                            UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
-                        }
-                    } else {
-                        res += "/cache/";
-                        UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
-                    }
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    res += "/cache/";
-                    UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
-                }
-            }
             res += new File(fullpath).getName();
             res += ("\n--locale=" + Locale.getDefault().toString());
             res += (wipe_data? "\n--wipe_data" : "");

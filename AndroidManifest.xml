@@ -45,6 +45,7 @@
         android:launchMode="singleTask"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <uses-library android:name="droidlogic.software.core" />
         <activity
             android:name="com.droidlogic.otaupgrade.UpdateActivity"
             android:label="@string/app_name"

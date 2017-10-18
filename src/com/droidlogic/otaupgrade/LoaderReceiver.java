@@ -55,7 +55,7 @@ public class LoaderReceiver extends BroadcastReceiver {
 
         private void getBackUpFileName() {
 
-            ArrayList<File> devs = mPref.getExternalStorageList();
+            ArrayList<File> devs = mPref.getStorageList(true);
             for ( int i = 0; (devs != null) && i < devs.size(); i++) {
                 File dev = devs.get(i);
                 if ( dev != null && dev.isDirectory() && dev.canWrite() ) {
