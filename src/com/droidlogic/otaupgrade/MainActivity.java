@@ -96,6 +96,12 @@ public class MainActivity extends Activity implements OnClickListener {
         mRestoreBtn = (Button) findViewById(R.id.restore);
         mWipeDate = (CheckBox) findViewById(R.id.wipedata);
         mWipeMedia = (CheckBox) findViewById(R.id.wipemedia);
+        boolean recoveryUsd = getResources().getBoolean(R.bool.device_custom_recovery);
+
+        if (!recoveryUsd) {
+            mWipeDate.setVisibility(View.GONE);
+            mWipeMedia.setVisibility(View.GONE);
+        }
         //mWipeCache = (CheckBox) findViewById(R.id.wipecache);
         filename = (TextView) findViewById(R.id.update_file_name);
         filepath = (TextView) findViewById(R.id.update_full_name);
@@ -293,7 +299,10 @@ public class MainActivity extends Activity implements OnClickListener {
 
             String fullname = filepath.getText().toString();
             if ( fullname.lastIndexOf("/") > 0 && (filename != null) && (filename.length() > 0)) {
-                UpdateMode = mPreference.createAmlScript(fullname,mWipeDate.isChecked(),mWipeMedia.isChecked());
+                if (mWipeDate == null)
+                    UpdateMode = mPreference.createAmlScript(fullname, false, false);
+                else
+                    UpdateMode = mPreference.createAmlScript(fullname,mWipeDate.isChecked(),mWipeMedia.isChecked());
                 UpdateDialog(fullname);
             } else {
                 Toast.makeText(this, getString(R.string.file_not_exist), 2000).show();
