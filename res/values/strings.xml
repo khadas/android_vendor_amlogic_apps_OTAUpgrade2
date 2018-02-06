@@ -118,4 +118,5 @@
     <string name="noti_msg">Download success</string>
     <string name="update_download">Update Downloading</string>
     <string name="prepare_waitting">"prepare,make sure BACKUP file in your external storage"</string>
+    <string name="reset_wipe">"update file is on the phone,cannot wipe data"</string>
 </resources>
