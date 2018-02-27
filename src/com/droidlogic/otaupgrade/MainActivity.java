@@ -296,13 +296,20 @@ public class MainActivity extends Activity implements OnClickListener {
             break;
 
         case R.id.btn_locale_certern:
-
             String fullname = filepath.getText().toString();
             if ( fullname.lastIndexOf("/") > 0 && (filename != null) && (filename.length() > 0)) {
                 if (mWipeDate == null)
                     UpdateMode = mPreference.createAmlScript(fullname, false, false);
                 else
                     UpdateMode = mPreference.createAmlScript(fullname,mWipeDate.isChecked(),mWipeMedia.isChecked());
+
+                if (UpdateMode == OtaUpgradeUtils.UPDATE_OTA && mPreference.inLocal(fullname)
+                        &&(mWipeDate.isChecked() || mWipeMedia.isChecked())) {
+                        mWipeDate.setChecked(false);
+                        mWipeMedia.setChecked(false);
+                        Toast.makeText(this, getString(R.string.reset_wipe), Toast.LENGTH_LONG).show();
+                }
+
                 UpdateDialog(fullname);
             } else {
                 Toast.makeText(this, getString(R.string.file_not_exist), 2000).show();
