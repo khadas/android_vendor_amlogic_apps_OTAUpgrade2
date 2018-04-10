@@ -511,9 +511,9 @@ public class PrefUtils implements DownloadUpdateTask.CheckPathCallBack{
             if (updateFilePath.startsWith("/cache/"))
                 UpdateMode = OtaUpgradeUtils.UPDATE_OTA;
             res += new File(fullpath).getName();
-            res += ("\n --locale=" + Locale.getDefault().toString());
-            res += (wipe_data? "\n --wipe_data" : "");
-            res += (wipe_cache? "\n --wipe_media" : "");
+            res += ("\n--locale=" + Locale.getDefault().toString());
+            res += (wipe_data? "\n--wipe_data" : "");
+            res += (wipe_cache? "\n--wipe_media" : "");
 
             //res += (mWipeCache.isChecked() ? "\n--wipe_cache" : "");
             try {
