@@ -100,7 +100,7 @@
     <string name="scan_title">扫描</string>
     <string name="scan_tip">扫描中,请等待...</string>
     <string name="backup_result">备份完成</string>
-    <string name="restore_result">备份已经恢复</string>
+    <string name="restore_result">恢复备份将在后台继续执行</string>
     <string name="noti_msg">"下载成功"</string>
     <string name="update_download">"升级包下载中"</string>
     <string name="remove_hit">"保证外设连接正常，否则备份转存失败"</string>
