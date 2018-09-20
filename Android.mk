@@ -3,10 +3,16 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
 LOCAL_STATIC_JAVA_LIBRARIES := libota
-LOCAL_SDK_VERSION := current
 
 ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 26 && echo OK),OK)
 LOCAL_PROPRIETARY_MODULE := true
+endif
+
+ifeq ($(PLATFORM_SDK_VERSION),28)
+LOCAL_PRIVATE_PLATFORM_APIS:=true
+LOCAL_JAVA_LIBRARIES += org.apache.http.legacy
+else
+LOCAL_SDK_VERSION := current
 endif
 
 ifeq ($(PLATFORM_SDK_VERSION),23)
