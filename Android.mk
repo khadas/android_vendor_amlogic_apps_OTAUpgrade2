@@ -4,12 +4,13 @@ include $(CLEAR_VARS)
 LOCAL_MODULE_TAGS := optional
 LOCAL_STATIC_JAVA_LIBRARIES := libota
 
-ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 26 && echo OK),OK)
+ifeq (($(shell test $(PLATFORM_SDK_VERSION) -ge 26 ) && ($(shell test $(PLATFORM_SDK_VERSION) -lt 28)  && echo OK),OK)
 LOCAL_PROPRIETARY_MODULE := true
 endif
 
 ifeq ($(PLATFORM_SDK_VERSION),28)
-LOCAL_PRIVATE_PLATFORM_APIS:=true
+LOCAL_PRIVATE_PLATFORM_APIS := true
+LOCAL_PRODUCT_MODULE := true
 LOCAL_JAVA_LIBRARIES += org.apache.http.legacy
 else
 LOCAL_SDK_VERSION := current
@@ -25,14 +26,16 @@ ifeq ($(PLATFORM_SDK_VERSION),23)
                        $(TOP)/src/com/droidlogic/otaupgrade/PrefUtils.java \
                        $(TOP)/src/com/droidlogic/otaupgrade/UpdateActivity.java \
                        $(TOP)/src/com/droidlogic/otaupgrade/UpdateService.java
+else ifeq ($(PLATFORM_SDK_VERSION),28)
+    LOCAL_SRC_FILES := $(call all-java-files-under, src)
 else
-   LOCAL_SRC_FILES := $(call all-java-files-under, src)\
-   $(call all-Iaidl-files-under, src)
+    LOCAL_SRC_FILES := $(call all-java-files-under, src)\
+    $(call all-Iaidl-files-under, src)
 endif
 LOCAL_PACKAGE_NAME := OTAUpgrade
 LOCAL_CERTIFICATE := platform
 LOCAL_DEX_PREOPT := false
-LOCAL_PROGUARD_ENABLED := full
+LOCAL_PROGUARD_ENABLED := disabled
 LOCAL_PROGUARD_FLAGS := -include $(LOCAL_PATH)/proguard.flags
 
 include $(BUILD_PACKAGE)
@@ -40,7 +43,6 @@ include $(BUILD_PACKAGE)
 
 include $(CLEAR_VARS)
 LOCAL_PREBUILT_STATIC_JAVA_LIBRARIES := libota:libs/libotaupdate.jar
-
 include $(BUILD_MULTI_PREBUILT)
 
 
