@@ -54,6 +54,7 @@ public class ABCheckUpService extends Service {
     private boolean download = false;
     private PrefUtils mPref;
     private BroadcastReceiver mReceiver;
+    private UpgradeInfo mUpdateInfo;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -65,7 +66,7 @@ public class ABCheckUpService extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         this.registerReceiver(mReceiver, filter);
-        UpgradeInfo update = new UpgradeInfo(this);
+        mUpdateInfo = new UpgradeInfo(this);
     }
 
     @Override
@@ -74,6 +75,11 @@ public class ABCheckUpService extends Service {
     }
     public String createParams(){
         PrefUtil pref=new PrefUtil(ABCheckUpService.this);
+        if (UpgradeInfo.firmware.equals("unknown")) {
+            String url = ABCheckUpService.this.getResources().getString(R.string.otaupdateurl);
+            String version = ABCheckUpService.this.getResources().getString(R.string.cur_version);
+            mUpdateInfo.setCustomValue(version,url);
+        }
         String params = "updating_apk_version="+UpgradeInfo.updating_apk_version;
         params+="&board="+UpgradeInfo.board;
         params+="&device="+UpgradeInfo.device;
@@ -142,6 +148,9 @@ public class ABCheckUpService extends Service {
             if ( ab_update.equalsIgnoreCase("true") ) {
                 download = true;
                 String url=UpgradeInfo.getString(URL_UPDATE);
+                if (url.equals("unknown")) {
+                    url = ABCheckUpService.this.getResources().getString(R.string.otaupdateurl);
+                }
                 String params = createParams();
                 Log.d(TAG, "url:"+url+"  params="+params);
                 String httpResult = sendPost(url,params);

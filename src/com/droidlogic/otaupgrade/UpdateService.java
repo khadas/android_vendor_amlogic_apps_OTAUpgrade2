@@ -33,7 +33,7 @@ import com.amlogic.update.CheckUpdateTask;
 import com.amlogic.update.DownloadUpdateTask;
 import com.amlogic.update.Notifier;
 import com.amlogic.update.UpdateTasks;
-
+import com.amlogic.update.util.UpgradeInfo;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -137,6 +137,12 @@ public class UpdateService extends Service {
         super.onCreate();
         mContext = getBaseContext();
         mPrefUtils = new PrefUtils(mContext);
+        UpgradeInfo upgrade = new UpgradeInfo(this);
+        if (UpgradeInfo.firmware.equals("unknown")) {
+            String url = UpdateService.this.getResources().getString(R.string.otaupdateurl);
+            String version = UpdateService.this.getResources().getString(R.string.cur_version);
+            upgrade.setCustomValue(version,url);
+        }
         initInstance();
     }
 

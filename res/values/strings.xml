@@ -119,4 +119,8 @@
     <string name="update_download">Update Downloading</string>
     <string name="prepare_waitting">"prepare,make sure BACKUP file in your external storage"</string>
     <string name="reset_wipe">"update file is on the phone,cannot wipe data"</string>
+    <!-- Do Not Translate -->
+    <string name="cur_version">00502001</string>
+    <!-- Do Not Translate -->
+    <string name="otaupdateurl">http://10.28.11.53:8080/otaupdate/update</string>
 </resources>

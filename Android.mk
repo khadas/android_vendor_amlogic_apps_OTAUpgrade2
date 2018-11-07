@@ -26,8 +26,6 @@ ifeq ($(PLATFORM_SDK_VERSION),23)
                        $(TOP)/src/com/droidlogic/otaupgrade/PrefUtils.java \
                        $(TOP)/src/com/droidlogic/otaupgrade/UpdateActivity.java \
                        $(TOP)/src/com/droidlogic/otaupgrade/UpdateService.java
-else ifeq ($(PLATFORM_SDK_VERSION),28)
-    LOCAL_SRC_FILES := $(call all-java-files-under, src)
 else
     LOCAL_SRC_FILES := $(call all-java-files-under, src)\
     $(call all-Iaidl-files-under, src)

@@ -64,6 +64,9 @@
         <receiver android:name="com.droidlogic.otaupgrade.LoaderReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                 <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
                 <action android:name="com.android.otaupdate.aml.backup" />
                 <action android:name="com.android.otaupdate.aml.restore" />
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
