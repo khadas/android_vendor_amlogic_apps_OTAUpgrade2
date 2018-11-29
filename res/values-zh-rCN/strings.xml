@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">"升级&amp;备份"</string>
+    <string name="app_name">"升级"</string>
     <string name="version_info">"版本信息"</string>
     <string name="check_update">"检查更新"</string>
     <string name="update_online">"在线更新"</string>

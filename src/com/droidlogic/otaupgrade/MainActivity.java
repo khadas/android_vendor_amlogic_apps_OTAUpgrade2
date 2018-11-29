@@ -54,7 +54,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-
+import android.os.Build;
 
 /**
  * @ClassName UpdateActivity
@@ -249,6 +249,16 @@ public class MainActivity extends Activity implements OnClickListener {
 
             if (vg != null) {
                 vg.setVisibility(View.GONE);
+            }
+        }
+        if (Build.VERSION.SDK_INT >= 28) {
+            ViewGroup vp = (ViewGroup) findViewById(R.id.backup_layout);
+            if (vp != null) {
+                vp.setVisibility(View.GONE);
+            }
+            View view = findViewById(R.id.backuptitle);
+            if (view != null) {
+                view.setVisibility(View.GONE);
             }
         }
         String act = getIntent().getAction();

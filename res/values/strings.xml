@@ -14,7 +14,7 @@
 -->
 <resources>
 
-    <string name="app_name">UPDATE&amp;BACKUP</string>
+    <string name="app_name">UPDATE</string>
     <string name="version_info">Version Information</string>
     <string name="check_update">Check Update</string>
     <string name="update_online">Online update</string>
