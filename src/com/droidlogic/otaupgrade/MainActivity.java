@@ -98,7 +98,7 @@ public class MainActivity extends Activity implements OnClickListener {
         mWipeMedia = (CheckBox) findViewById(R.id.wipemedia);
         boolean recoveryUsd = getResources().getBoolean(R.bool.device_custom_recovery);
 
-        if (!recoveryUsd) {
+        if (!recoveryUsd || Build.VERSION.SDK_INT >= 28) {
             mWipeDate.setVisibility(View.GONE);
             mWipeMedia.setVisibility(View.GONE);
         }
