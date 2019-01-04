@@ -48,6 +48,7 @@ public class ABCheckUpService extends Service {
     private Handler mRCHandler;
     private static final String AB_UPDATE="ro.build.ab_update";
     private static final String URL_UPDATE="ro.product.otaupdateurl";
+    private static final String BROADCAST_ACTION = "android.action.updateui";
     public static final String REASON = "reason";
     public static final String REASON_UPDATE = "update";
     public static final String REASON_COMPLETE = "complete";
@@ -184,6 +185,7 @@ public class ABCheckUpService extends Service {
         @Override
         public void onReceive ( Context context, Intent intent ) {
             if ( ( ConnectivityManager.CONNECTIVITY_ACTION ).equals ( intent.getAction() ) ) {
+                Log.d(TAG, "CONNECTIVITY_CHANGED, Context = " + context.getClass().getName());
                 Bundle bundle = intent.getExtras();
                 NetworkInfo netInfo = ( NetworkInfo )bundle.getParcelable( WifiManager.EXTRA_NETWORK_INFO);
                 if ( mPref.getBooleanVal ( "Boot_Checked", false ) &&
@@ -192,6 +194,7 @@ public class ABCheckUpService extends Service {
                     mPref.setBoolean ( "Boot_Checked", false );
                     mRCHandler.post(update);
                 }
+                context.sendBroadcast(new Intent(BROADCAST_ACTION));
             }
         }
     }
